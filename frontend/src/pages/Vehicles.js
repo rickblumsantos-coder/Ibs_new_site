@@ -318,7 +318,7 @@ export default function Vehicles() {
         </div>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="bg-zinc-950 border-zinc-800 text-zinc-50" data-testid="vehicle-dialog">
+          <DialogContent className="bg-zinc-950 border-zinc-800 text-zinc-50 max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="vehicle-dialog">
             <DialogHeader>
               <DialogTitle className="text-xl font-heading font-bold uppercase">
                 {editingVehicle ? 'EDITAR VEÍCULO' : 'NOVO VEÍCULO'}
@@ -347,72 +347,175 @@ export default function Vehicles() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="license_plate" className="text-xs font-semibold uppercase text-zinc-500">
-                    Placa *
-                  </Label>
-                  <Input
-                    id="license_plate"
-                    value={formData.license_plate}
-                    onChange={(e) => setFormData({ ...formData, license_plate: e.target.value.toUpperCase() })}
-                    required
-                    className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm font-mono"
-                    data-testid="vehicle-plate-input"
-                  />
+                
+                <div className="border-t border-zinc-800 pt-4">
+                  <h3 className="text-sm font-semibold uppercase text-zinc-400 mb-3">Informações Básicas</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="license_plate" className="text-xs font-semibold uppercase text-zinc-500">
+                        Placa *
+                      </Label>
+                      <Input
+                        id="license_plate"
+                        value={formData.license_plate}
+                        onChange={(e) => setFormData({ ...formData, license_plate: e.target.value.toUpperCase() })}
+                        required
+                        placeholder="ABC-1234"
+                        className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm font-mono"
+                        data-testid="vehicle-plate-input"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="brand" className="text-xs font-semibold uppercase text-zinc-500">
+                        Marca *
+                      </Label>
+                      <Input
+                        id="brand"
+                        value={formData.brand}
+                        onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                        required
+                        placeholder="Honda, Toyota, VW..."
+                        className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
+                        data-testid="vehicle-brand-input"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="model" className="text-xs font-semibold uppercase text-zinc-500">
+                        Modelo *
+                      </Label>
+                      <Input
+                        id="model"
+                        value={formData.model}
+                        onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                        required
+                        placeholder="Civic, Corolla, Gol..."
+                        className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
+                        data-testid="vehicle-model-input"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="year" className="text-xs font-semibold uppercase text-zinc-500">
+                        Ano *
+                      </Label>
+                      <Input
+                        id="year"
+                        type="number"
+                        value={formData.year}
+                        onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                        required
+                        className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm font-mono"
+                        data-testid="vehicle-year-input"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="brand" className="text-xs font-semibold uppercase text-zinc-500">
-                      Marca *
-                    </Label>
-                    <Input
-                      id="brand"
-                      value={formData.brand}
-                      onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                      required
-                      className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
-                      data-testid="vehicle-brand-input"
-                    />
+
+                <div className="border-t border-zinc-800 pt-4">
+                  <h3 className="text-sm font-semibold uppercase text-zinc-400 mb-3">Especificações</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="color" className="text-xs font-semibold uppercase text-zinc-500">
+                        Cor
+                      </Label>
+                      <Input
+                        id="color"
+                        value={formData.color}
+                        onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                        placeholder="Preto, Branco, Prata..."
+                        className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
+                        data-testid="vehicle-color-input"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="engine" className="text-xs font-semibold uppercase text-zinc-500">
+                        Motor
+                      </Label>
+                      <Input
+                        id="engine"
+                        value={formData.engine}
+                        onChange={(e) => setFormData({ ...formData, engine: e.target.value })}
+                        placeholder="1.0, 1.6, 2.0..."
+                        className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
+                        data-testid="vehicle-engine-input"
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="model" className="text-xs font-semibold uppercase text-zinc-500">
-                      Modelo *
-                    </Label>
-                    <Input
-                      id="model"
-                      value={formData.model}
-                      onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                      required
-                      className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
-                      data-testid="vehicle-model-input"
-                    />
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="transmission" className="text-xs font-semibold uppercase text-zinc-500">
+                        Câmbio
+                      </Label>
+                      <Select
+                        value={formData.transmission}
+                        onValueChange={(value) => setFormData({ ...formData, transmission: value })}
+                      >
+                        <SelectTrigger className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm" data-testid="vehicle-transmission-select">
+                          <SelectValue placeholder="Selecione o câmbio" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-zinc-950 border-zinc-800">
+                          <SelectItem value="Manual">Manual</SelectItem>
+                          <SelectItem value="Automático">Automático</SelectItem>
+                          <SelectItem value="CVT">CVT</SelectItem>
+                          <SelectItem value="Automatizado">Automatizado</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="fuel_type" className="text-xs font-semibold uppercase text-zinc-500">
+                        Combustível
+                      </Label>
+                      <Select
+                        value={formData.fuel_type}
+                        onValueChange={(value) => setFormData({ ...formData, fuel_type: value })}
+                      >
+                        <SelectTrigger className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm" data-testid="vehicle-fuel-select">
+                          <SelectValue placeholder="Selecione o combustível" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-zinc-950 border-zinc-800">
+                          <SelectItem value="Gasolina">Gasolina</SelectItem>
+                          <SelectItem value="Etanol">Etanol</SelectItem>
+                          <SelectItem value="Flex">Flex</SelectItem>
+                          <SelectItem value="Diesel">Diesel</SelectItem>
+                          <SelectItem value="Elétrico">Elétrico</SelectItem>
+                          <SelectItem value="Híbrido">Híbrido</SelectItem>
+                          <SelectItem value="GNV">GNV</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="mileage" className="text-xs font-semibold uppercase text-zinc-500">
+                        Quilometragem
+                      </Label>
+                      <Input
+                        id="mileage"
+                        type="number"
+                        value={formData.mileage}
+                        onChange={(e) => setFormData({ ...formData, mileage: e.target.value })}
+                        placeholder="Ex: 50000"
+                        className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm font-mono"
+                        data-testid="vehicle-mileage-input"
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+
+                <div className="border-t border-zinc-800 pt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="year" className="text-xs font-semibold uppercase text-zinc-500">
-                      Ano *
+                    <Label htmlFor="notes" className="text-xs font-semibold uppercase text-zinc-500">
+                      Observações
                     </Label>
-                    <Input
-                      id="year"
-                      type="number"
-                      value={formData.year}
-                      onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                      required
-                      className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm font-mono"
-                      data-testid="vehicle-year-input"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="color" className="text-xs font-semibold uppercase text-zinc-500">
-                      Cor
-                    </Label>
-                    <Input
-                      id="color"
-                      value={formData.color}
-                      onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                    <Textarea
+                      id="notes"
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      placeholder="Informações adicionais sobre o veículo..."
                       className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
-                      data-testid="vehicle-color-input"
+                      rows={2}
+                      data-testid="vehicle-notes-input"
                     />
                   </div>
                 </div>
