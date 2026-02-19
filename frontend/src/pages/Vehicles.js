@@ -137,7 +137,7 @@ export default function Vehicles() {
             data-testid="add-vehicle-button"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Novo Ve\u00edculo
+            Novo Veículo
           </Button>
         </div>
 
@@ -159,7 +159,7 @@ export default function Vehicles() {
           {loading ? (
             <div className="text-center py-12 text-zinc-500">Carregando...</div>
           ) : filteredVehicles.length === 0 ? (
-            <div className="text-center py-12 text-zinc-500">Nenhum ve\u00edculo encontrado</div>
+            <div className="text-center py-12 text-zinc-500">Nenhum veículo encontrado</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full" data-testid="vehicles-table">
@@ -170,7 +170,7 @@ export default function Vehicles() {
                     <th className="text-left px-4">Modelo</th>
                     <th className="text-left px-4">Ano</th>
                     <th className="text-left px-4">Cliente</th>
-                    <th className="text-right px-4">A\u00e7\u00f5es</th>
+                    <th className="text-right px-4">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -218,7 +218,7 @@ export default function Vehicles() {
           <DialogContent className="bg-zinc-950 border-zinc-800 text-zinc-50" data-testid="vehicle-dialog">
             <DialogHeader>
               <DialogTitle className="text-xl font-heading font-bold uppercase">
-                {editingVehicle ? 'EDITAR VE\u00cdCULO' : 'NOVO VE\u00cdCULO'}
+                {editingVehicle ? 'EDITAR VEÍCULO' : 'NOVO VEÍCULO'}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
