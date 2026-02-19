@@ -26,6 +26,7 @@ export default function Quotes() {
     vehicle_id: '',
     items: [],
     discount: 0,
+    labor_cost: 0,
     notes: '',
   });
   const [newItem, setNewItem] = useState({
@@ -100,7 +101,7 @@ export default function Quotes() {
   };
 
   const calculateTotal = () => {
-    return calculateSubtotal() - (parseFloat(formData.discount) || 0);
+    return calculateSubtotal() + (parseFloat(formData.labor_cost) || 0) - (parseFloat(formData.discount) || 0);
   };
 
   const handleSubmit = async (e) => {
@@ -115,6 +116,7 @@ export default function Quotes() {
       const data = {
         ...formData,
         discount: parseFloat(formData.discount) || 0,
+        labor_cost: parseFloat(formData.labor_cost) || 0,
       };
 
       if (editingQuote) {
@@ -175,6 +177,7 @@ export default function Quotes() {
       vehicle_id: '',
       items: [],
       discount: 0,
+      labor_cost: 0,
       notes: '',
     });
     setNewItem({ type: 'service', item_id: '', quantity: 1 });
