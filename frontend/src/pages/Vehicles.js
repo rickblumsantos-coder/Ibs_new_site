@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { api } from '@/utils/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Dialog,
@@ -13,7 +14,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, ChevronDown, ChevronRight, Car } from 'lucide-react';
 
 export default function Vehicles() {
   const [vehicles, setVehicles] = useState([]);
@@ -22,6 +23,7 @@ export default function Vehicles() {
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState(null);
+  const [expandedBrands, setExpandedBrands] = useState({});
   const [formData, setFormData] = useState({
     client_id: '',
     license_plate: '',
@@ -29,6 +31,11 @@ export default function Vehicles() {
     brand: '',
     year: new Date().getFullYear(),
     color: '',
+    transmission: '',
+    fuel_type: '',
+    mileage: '',
+    engine: '',
+    notes: '',
   });
 
   useEffect(() => {
