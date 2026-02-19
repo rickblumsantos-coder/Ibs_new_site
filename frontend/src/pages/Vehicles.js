@@ -60,7 +60,11 @@ export default function Vehicles() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const data = { ...formData, year: parseInt(formData.year) };
+      const data = { 
+        ...formData, 
+        year: parseInt(formData.year),
+        mileage: formData.mileage ? parseInt(formData.mileage) : null,
+      };
       if (editingVehicle) {
         await api.updateVehicle(editingVehicle.id, data);
         toast.success('Veículo atualizado com sucesso!');
@@ -85,6 +89,11 @@ export default function Vehicles() {
       brand: vehicle.brand,
       year: vehicle.year,
       color: vehicle.color || '',
+      transmission: vehicle.transmission || '',
+      fuel_type: vehicle.fuel_type || '',
+      mileage: vehicle.mileage || '',
+      engine: vehicle.engine || '',
+      notes: vehicle.notes || '',
     });
     setDialogOpen(true);
   };
