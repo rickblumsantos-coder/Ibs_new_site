@@ -78,6 +78,11 @@ class Vehicle(BaseModel):
     brand: str
     year: int
     color: Optional[str] = None
+    transmission: Optional[str] = None  # Manual, Automático, CVT, etc.
+    fuel_type: Optional[str] = None     # Gasolina, Etanol, Flex, Diesel, Elétrico, Híbrido
+    mileage: Optional[int] = None       # Quilometragem
+    engine: Optional[str] = None        # Motor (1.0, 1.6, 2.0, etc.)
+    notes: Optional[str] = None         # Observações adicionais
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class VehicleCreate(BaseModel):
@@ -87,6 +92,11 @@ class VehicleCreate(BaseModel):
     brand: str
     year: int
     color: Optional[str] = None
+    transmission: Optional[str] = None
+    fuel_type: Optional[str] = None
+    mileage: Optional[int] = None
+    engine: Optional[str] = None
+    notes: Optional[str] = None
 
 class Service(BaseModel):
     model_config = ConfigDict(extra="ignore")
