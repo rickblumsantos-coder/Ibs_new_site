@@ -119,6 +119,11 @@ export default function Vehicles() {
       brand: '',
       year: new Date().getFullYear(),
       color: '',
+      transmission: '',
+      fuel_type: '',
+      mileage: '',
+      engine: '',
+      notes: '',
     });
   };
 
@@ -133,6 +138,41 @@ export default function Vehicles() {
     vehicle.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
     getClientName(vehicle.client_id).toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Agrupar veículos por marca
+  const vehiclesByBrand = useMemo(() => {
+    const grouped = {};
+    filteredVehicles.forEach((vehicle) => {
+      const brand = vehicle.brand.toUpperCase();
+      if (!grouped[brand]) {
+        grouped[brand] = [];
+      }
+      grouped[brand].push(vehicle);
+    });
+    // Ordenar marcas alfabeticamente
+    return Object.keys(grouped)
+      .sort()
+      .reduce((acc, key) => {
+        acc[key] = grouped[key];
+        return acc;
+      }, {});
+  }, [filteredVehicles]);
+
+  const toggleBrand = (brand) => {
+    setExpandedBrands((prev) => ({
+      ...prev,
+      [brand]: !prev[brand],
+    }));
+  };
+
+  // Expandir todas as marcas por padrão
+  useEffect(() => {
+    const allBrands = {};
+    Object.keys(vehiclesByBrand).forEach((brand) => {
+      allBrands[brand] = true;
+    });
+    setExpandedBrands(allBrands);
+  }, [vehicles]);
 
   return (
     <Layout>
