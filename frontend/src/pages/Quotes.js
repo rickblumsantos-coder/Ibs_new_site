@@ -378,42 +378,80 @@ export default function Quotes() {
             </DialogHeader>
             <form onSubmit={handleSubmit}>
               <div className="space-y-6 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase text-zinc-500">Cliente *</Label>
-                    <Select
-                      value={formData.client_id}
-                      onValueChange={(value) => setFormData({ ...formData, client_id: value, vehicle_id: '' })}
-                      required
-                    >
-                      <SelectTrigger className="bg-zinc-950 border-zinc-800 rounded-sm" data-testid="quote-client-select">
-                        <SelectValue placeholder="Selecione" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-zinc-950 border-zinc-800">
-                        {clients.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                {/* Busca de Veículo com Autocomplete */}
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold uppercase text-zinc-500">
+                    <Car className="w-3 h-3 inline mr-1" />
+                    Buscar Veículo *
+                  </Label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                    <Input
+                      type="text"
+                      value={vehicleSearch}
+                      onChange={(e) => {
+                        setVehicleSearch(e.target.value);
+                        setShowVehicleDropdown(true);
+                        if (!e.target.value) {
+                          setFormData({ ...formData, vehicle_id: '', client_id: '' });
+                        }
+                      }}
+                      onFocus={() => setShowVehicleDropdown(true)}
+                      placeholder="Digite marca, modelo, placa ou nome do cliente..."
+                      className="pl-10 bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
+                      data-testid="vehicle-search-input"
+                    />
+                    {/* Dropdown de resultados */}
+                    {showVehicleDropdown && vehicleSearch && (
+                      <div className="absolute z-50 w-full mt-1 bg-zinc-950 border border-zinc-800 rounded-sm max-h-64 overflow-y-auto shadow-lg">
+                        {Object.keys(groupedVehicles).length === 0 ? (
+                          <div className="p-3 text-sm text-zinc-500 text-center">Nenhum veículo encontrado</div>
+                        ) : (
+                          Object.entries(groupedVehicles).map(([brand, brandVehicles]) => (
+                            <div key={brand}>
+                              <div className="px-3 py-2 bg-zinc-900/80 text-xs font-bold uppercase text-zinc-400 sticky top-0">
+                                {brand} ({brandVehicles.length})
+                              </div>
+                              {brandVehicles.map((vehicle) => (
+                                <button
+                                  key={vehicle.id}
+                                  type="button"
+                                  onClick={() => selectVehicle(vehicle)}
+                                  className="w-full px-3 py-2 text-left hover:bg-zinc-800 transition-colors flex justify-between items-center"
+                                  data-testid={`vehicle-option-${vehicle.id}`}
+                                >
+                                  <div>
+                                    <div className="text-sm text-zinc-200">{vehicle.model}</div>
+                                    <div className="text-xs text-zinc-500">{vehicle.license_plate} • {getClientName(vehicle.client_id)}</div>
+                                  </div>
+                                  <span className="text-xs text-zinc-600 font-mono">{vehicle.year}</span>
+                                </button>
+                              ))}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase text-zinc-500">Veículo *</Label>
-                    <Select
-                      value={formData.vehicle_id}
-                      onValueChange={(value) => setFormData({ ...formData, vehicle_id: value })}
-                      required
-                      disabled={!formData.client_id}
-                    >
-                      <SelectTrigger className="bg-zinc-950 border-zinc-800 rounded-sm" data-testid="quote-vehicle-select">
-                        <SelectValue placeholder={formData.client_id ? "Selecione" : "Selecione cliente primeiro"} />
-                      </SelectTrigger>
-                      <SelectContent className="bg-zinc-950 border-zinc-800">
-                        {getClientVehicles(formData.client_id).map((v) => (
-                          <SelectItem key={v.id} value={v.id}>{v.brand} {v.model} - {v.license_plate}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  {formData.vehicle_id && (
+                    <div className="flex items-center gap-2 mt-2 p-2 bg-zinc-900/50 border border-zinc-800 rounded-sm">
+                      <Car className="w-4 h-4 text-red-500" />
+                      <span className="text-sm text-zinc-300">{getVehicleInfo(formData.vehicle_id)}</span>
+                      <span className="text-xs text-zinc-500">• Cliente: {getClientName(formData.client_id)}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setFormData({ ...formData, vehicle_id: '', client_id: '' });
+                          setVehicleSearch('');
+                        }}
+                        className="ml-auto text-zinc-500 hover:text-red-400 p-1 h-auto"
+                      >
+                        <XIcon className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="border border-zinc-800 rounded-sm p-4 bg-zinc-900/50">
