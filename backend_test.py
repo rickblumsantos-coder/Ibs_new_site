@@ -118,7 +118,7 @@ class IBSAutoTester:
             # Verify new fields are properly stored
             success_get, vehicle_response = self.run_test("Get Vehicles with Specs", "GET", "vehicles", 200)
             if success_get and vehicle_response:
-                vehicles = vehicle_response.get('data', vehicle_response)
+                vehicles = vehicle_response if isinstance(vehicle_response, list) else vehicle_response.get('data', [])
                 if isinstance(vehicles, list) and len(vehicles) > 0:
                     created_vehicle = next((v for v in vehicles if v.get('id') == vehicle_id), None)
                     if created_vehicle:
@@ -128,6 +128,10 @@ class IBSAutoTester:
                             print(f"❌ Missing specification fields: {missing_specs}")
                         else:
                             print(f"✅ All specification fields present: {spec_fields}")
+                    else:
+                        print(f"❌ Could not find created vehicle with ID: {vehicle_id}")
+                else:
+                    print(f"❌ No vehicles found in response")
             
             # Get vehicles by client
             self.run_test("Get Vehicles by Client", "GET", f"vehicles/by-client/{self.created_data['client_id']}", 200)
