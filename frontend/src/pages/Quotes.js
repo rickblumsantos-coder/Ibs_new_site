@@ -183,6 +183,7 @@ export default function Quotes() {
       notes: '',
     });
     setNewItem({ type: 'service', item_id: '', quantity: 1 });
+    setVehicleSearch('');
   };
 
   const getClientName = (clientId) => {
@@ -197,6 +198,42 @@ export default function Quotes() {
 
   const getClientVehicles = (clientId) => {
     return vehicles.filter((v) => v.client_id === clientId);
+  };
+
+  // Filtrar veículos pela busca (marca, modelo ou placa)
+  const filteredVehiclesForSearch = useMemo(() => {
+    if (!vehicleSearch.trim()) return vehicles;
+    const term = vehicleSearch.toLowerCase();
+    return vehicles.filter((v) =>
+      v.brand.toLowerCase().includes(term) ||
+      v.model.toLowerCase().includes(term) ||
+      v.license_plate.toLowerCase().includes(term) ||
+      getClientName(v.client_id).toLowerCase().includes(term)
+    );
+  }, [vehicles, vehicleSearch, clients]);
+
+  // Agrupar veículos filtrados por marca
+  const groupedVehicles = useMemo(() => {
+    const grouped = {};
+    filteredVehiclesForSearch.forEach((vehicle) => {
+      const brand = vehicle.brand.toUpperCase();
+      if (!grouped[brand]) {
+        grouped[brand] = [];
+      }
+      grouped[brand].push(vehicle);
+    });
+    return Object.keys(grouped)
+      .sort()
+      .reduce((acc, key) => {
+        acc[key] = grouped[key];
+        return acc;
+      }, {});
+  }, [filteredVehiclesForSearch]);
+
+  const selectVehicle = (vehicle) => {
+    setFormData({ ...formData, vehicle_id: vehicle.id, client_id: vehicle.client_id });
+    setVehicleSearch(`${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`);
+    setShowVehicleDropdown(false);
   };
 
   const getStatusBadge = (status) => {
