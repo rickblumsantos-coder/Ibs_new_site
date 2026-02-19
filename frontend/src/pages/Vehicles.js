@@ -1,0 +1,344 @@
+import React, { useEffect, useState } from 'react';
+import { Layout } from '@/components/layout/Layout';
+import { api } from '@/utils/api';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { toast } from 'sonner';
+import { Plus, Edit, Trash2, Search } from 'lucide-react';
+
+export default function Vehicles() {
+  const [vehicles, setVehicles] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingVehicle, setEditingVehicle] = useState(null);
+  const [formData, setFormData] = useState({
+    client_id: '',
+    license_plate: '',
+    model: '',
+    brand: '',
+    year: new Date().getFullYear(),
+    color: '',
+  });
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const [vehiclesRes, clientsRes] = await Promise.all([
+        api.getVehicles(),
+        api.getClients(),
+      ]);
+      setVehicles(vehiclesRes.data);
+      setClients(clientsRes.data);
+    } catch (error) {
+      toast.error('Erro ao carregar dados');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const data = { ...formData, year: parseInt(formData.year) };
+      if (editingVehicle) {
+        await api.updateVehicle(editingVehicle.id, data);
+        toast.success('Ve\u00edculo atualizado com sucesso!');
+      } else {
+        await api.createVehicle(data);
+        toast.success('Ve\u00edculo criado com sucesso!');
+      }
+      setDialogOpen(false);
+      resetForm();
+      loadData();
+    } catch (error) {
+      toast.error('Erro ao salvar ve\u00edculo');
+    }
+  };
+
+  const handleEdit = (vehicle) => {
+    setEditingVehicle(vehicle);
+    setFormData({
+      client_id: vehicle.client_id,
+      license_plate: vehicle.license_plate,
+      model: vehicle.model,
+      brand: vehicle.brand,
+      year: vehicle.year,
+      color: vehicle.color || '',
+    });
+    setDialogOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Tem certeza que deseja excluir este ve\u00edculo?')) {
+      try {
+        await api.deleteVehicle(id);
+        toast.success('Ve\u00edculo exclu\u00eddo com sucesso!');
+        loadData();
+      } catch (error) {
+        toast.error('Erro ao excluir ve\u00edculo');
+      }
+    }
+  };
+
+  const resetForm = () => {
+    setEditingVehicle(null);
+    setFormData({
+      client_id: '',
+      license_plate: '',
+      model: '',
+      brand: '',
+      year: new Date().getFullYear(),
+      color: '',
+    });
+  };
+
+  const getClientName = (clientId) => {
+    const client = clients.find((c) => c.id === clientId);
+    return client ? client.name : 'N/A';
+  };
+
+  const filteredVehicles = vehicles.filter((vehicle) =>
+    vehicle.license_plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vehicle.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    getClientName(vehicle.client_id).toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <Layout>
+      <div data-testid="vehicles-page">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+          <div>
+            <h1 className="text-4xl font-heading font-bold uppercase tracking-tight text-zinc-50">
+              VE\u00cdCULOS
+            </h1>
+            <p className="text-zinc-400 text-sm mt-1">Gerencie os ve\u00edculos dos clientes</p>
+          </div>
+          <Button
+            onClick={() => {
+              resetForm();
+              setDialogOpen(true);
+            }}
+            className="bg-red-600 hover:bg-red-700 text-white font-bold uppercase tracking-wide rounded-sm h-10 px-6 active:scale-95"
+            data-testid="add-vehicle-button"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Novo Ve\u00edculo
+          </Button>
+        </div>
+
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+            <Input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar por placa, modelo, marca ou cliente..."
+              className="pl-10 bg-zinc-950 border-zinc-800 focus:border-red-600 focus:ring-1 focus:ring-red-600 rounded-sm"
+              data-testid="search-input"
+            />
+          </div>
+        </div>
+
+        <div className="bg-zinc-900 border border-zinc-800 rounded-sm overflow-hidden">
+          {loading ? (
+            <div className="text-center py-12 text-zinc-500">Carregando...</div>
+          ) : filteredVehicles.length === 0 ? (
+            <div className="text-center py-12 text-zinc-500">Nenhum ve\u00edculo encontrado</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full" data-testid="vehicles-table">
+                <thead>
+                  <tr className="bg-zinc-900/50 text-zinc-400 uppercase text-xs font-bold tracking-wider h-10">
+                    <th className="text-left px-4">Placa</th>
+                    <th className="text-left px-4">Marca</th>
+                    <th className="text-left px-4">Modelo</th>
+                    <th className="text-left px-4">Ano</th>
+                    <th className="text-left px-4">Cliente</th>
+                    <th className="text-right px-4">A\u00e7\u00f5es</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredVehicles.map((vehicle) => (
+                    <tr
+                      key={vehicle.id}
+                      className="border-b border-zinc-800 hover:bg-zinc-900/50 transition-colors h-12"
+                    >
+                      <td className="text-sm text-zinc-200 px-4 font-mono font-bold uppercase">{vehicle.license_plate}</td>
+                      <td className="text-sm text-zinc-200 px-4">{vehicle.brand}</td>
+                      <td className="text-sm text-zinc-200 px-4">{vehicle.model}</td>
+                      <td className="text-sm text-zinc-200 px-4 font-mono">{vehicle.year}</td>
+                      <td className="text-sm text-zinc-200 px-4">{getClientName(vehicle.client_id)}</td>
+                      <td className="px-4">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            onClick={() => handleEdit(vehicle)}
+                            variant="ghost"
+                            size="sm"
+                            className="hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-sm"
+                            data-testid={`edit-vehicle-${vehicle.id}`}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            onClick={() => handleDelete(vehicle.id)}
+                            variant="ghost"
+                            size="sm"
+                            className="hover:bg-red-950 text-red-400 hover:text-red-300 rounded-sm"
+                            data-testid={`delete-vehicle-${vehicle.id}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent className="bg-zinc-950 border-zinc-800 text-zinc-50" data-testid="vehicle-dialog">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-heading font-bold uppercase">
+                {editingVehicle ? 'EDITAR VE\u00cdCULO' : 'NOVO VE\u00cdCULO'}
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit}>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="client" className="text-xs font-semibold uppercase text-zinc-500">
+                    Cliente *
+                  </Label>
+                  <Select
+                    value={formData.client_id}
+                    onValueChange={(value) => setFormData({ ...formData, client_id: value })}
+                    required
+                  >
+                    <SelectTrigger className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm" data-testid="vehicle-client-select">
+                      <SelectValue placeholder="Selecione um cliente" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-zinc-950 border-zinc-800">
+                      {clients.map((client) => (
+                        <SelectItem key={client.id} value={client.id}>
+                          {client.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="license_plate" className="text-xs font-semibold uppercase text-zinc-500">
+                    Placa *
+                  </Label>
+                  <Input
+                    id="license_plate"
+                    value={formData.license_plate}
+                    onChange={(e) => setFormData({ ...formData, license_plate: e.target.value.toUpperCase() })}
+                    required
+                    className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm font-mono"
+                    data-testid="vehicle-plate-input"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="brand" className="text-xs font-semibold uppercase text-zinc-500">
+                      Marca *
+                    </Label>
+                    <Input
+                      id="brand"
+                      value={formData.brand}
+                      onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                      required
+                      className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
+                      data-testid="vehicle-brand-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="model" className="text-xs font-semibold uppercase text-zinc-500">
+                      Modelo *
+                    </Label>
+                    <Input
+                      id="model"
+                      value={formData.model}
+                      onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                      required
+                      className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
+                      data-testid="vehicle-model-input"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="year" className="text-xs font-semibold uppercase text-zinc-500">
+                      Ano *
+                    </Label>
+                    <Input
+                      id="year"
+                      type="number"
+                      value={formData.year}
+                      onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                      required
+                      className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm font-mono"
+                      data-testid="vehicle-year-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="color" className="text-xs font-semibold uppercase text-zinc-500">
+                      Cor
+                    </Label>
+                    <Input
+                      id="color"
+                      value={formData.color}
+                      onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                      className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
+                      data-testid="vehicle-color-input"
+                    />
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setDialogOpen(false);
+                    resetForm();
+                  }}
+                  className="border border-zinc-700 hover:border-zinc-500 text-white rounded-sm"
+                  data-testid="cancel-button"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded-sm active:scale-95"
+                  data-testid="save-vehicle-button"
+                >
+                  {editingVehicle ? 'ATUALIZAR' : 'CRIAR'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </Layout>
+  );
+}

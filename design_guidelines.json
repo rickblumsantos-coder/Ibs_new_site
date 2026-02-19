@@ -1,0 +1,157 @@
+{
+  "identity": {
+    "name": "E1 - The Pit Stop Pro",
+    "tone": "Tactical, High-Precision, Industrial, Reliable",
+    "core_philosophy": "1.5-second glance rule. Information must be digestible instantly. Dark mode is mandatory for the workshop environment.",
+    "banned_elements": [
+      "Soft shadows",
+      "Rounded corners > 4px",
+      "Gradients on text",
+      "Pastel colors",
+      "Generic 'SaaS Blue'",
+      "Cute illustrations"
+    ]
+  },
+  "typography": {
+    "font_family_heading": "Barlow Condensed, sans-serif",
+    "font_family_body": "Inter, sans-serif",
+    "font_family_mono": "JetBrains Mono, monospace",
+    "import_url": "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap",
+    "rules": {
+      "headings": "Uppercase, tracking-tight, weight-700. Use for Page Titles and Section Headers.",
+      "subheadings": "Barlow Condensed, weight-600, tracking-normal. Use for Card Titles.",
+      "body": "Inter, weight-400, high legibility. Use for general text.",
+      "data": "JetBrains Mono, weight-500. MANDATORY for: License Plates, VINs, Prices, Phone Numbers, Dates.",
+      "labels": "Inter, weight-600, uppercase, text-xs, tracking-wider, text-muted-foreground."
+    }
+  },
+  "colors": {
+    "palette": {
+      "background": "#09090b",
+      "surface": "#18181b",
+      "surface_highlight": "#27272a",
+      "border": "#27272a",
+      "border_active": "#3f3f46",
+      "primary": "#DC2626",
+      "primary_hover": "#B91C1C",
+      "primary_foreground": "#FFFFFF",
+      "text_main": "#FAFAFA",
+      "text_muted": "#A1A1AA",
+      "success": "#22C55E",
+      "warning": "#EAB308",
+      "error": "#EF4444"
+    },
+    "tailwind_config_extension": {
+      "colors": {
+        "workshop-bg": "#09090b",
+        "workshop-card": "#18181b",
+        "workshop-red": "#DC2626"
+      }
+    },
+    "gradients": {
+      "subtle_glow": "radial-gradient(circle at center, rgba(220, 38, 38, 0.15) 0%, transparent 70%)"
+    }
+  },
+  "layout": {
+    "grid_system": "Bento Grid",
+    "spacing": {
+      "container_padding": "p-6 md:p-8",
+      "gap": "gap-4 md:gap-6",
+      "internal_padding": "p-5"
+    },
+    "strategies": [
+      "Dashboard: High Density. grid-cols-1 md:grid-cols-4. Summary cards col-span-1. Main tables col-span-2 or 3.",
+      "Forms: Single column max-w-2xl for focus. Split forms into clear sections (Client Data | Vehicle Data).",
+      "Lists: Dense rows, minimal padding (py-2). Alternating row colors (zebra striping) for readability."
+    ]
+  },
+  "components": {
+    "global_styles": {
+      "radius": "rounded-sm",
+      "shadow": "shadow-none",
+      "border": "border border-zinc-800"
+    },
+    "cards": {
+      "style": "bg-zinc-900 border border-zinc-800 rounded-sm relative overflow-hidden",
+      "header": "border-b border-zinc-800 p-4 bg-zinc-900/50",
+      "content": "p-4"
+    },
+    "buttons": {
+      "primary": "bg-red-600 hover:bg-red-700 text-white font-bold uppercase tracking-wide rounded-sm h-10 px-6 transition-all active:scale-95",
+      "secondary": "bg-transparent border border-zinc-700 hover:border-zinc-500 text-white rounded-sm h-10 px-4",
+      "ghost": "hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-sm"
+    },
+    "inputs": {
+      "style": "bg-zinc-950 border-zinc-800 focus:border-red-600 focus:ring-1 focus:ring-red-600 rounded-sm h-10 text-white placeholder:text-zinc-600",
+      "label": "text-xs font-semibold uppercase text-zinc-500 mb-1.5 block"
+    },
+    "tables": {
+      "header": "bg-zinc-900/50 text-zinc-400 uppercase text-xs font-bold tracking-wider h-10",
+      "row": "border-b border-zinc-800 hover:bg-zinc-900/50 transition-colors h-12",
+      "cell": "text-sm text-zinc-200"
+    },
+    "badges": {
+      "base": "inline-flex items-center px-2.5 py-0.5 rounded-sm text-xs font-medium border",
+      "success": "bg-green-950/30 text-green-400 border-green-900",
+      "warning": "bg-yellow-950/30 text-yellow-400 border-yellow-900",
+      "error": "bg-red-950/30 text-red-400 border-red-900",
+      "neutral": "bg-zinc-800 text-zinc-400 border-zinc-700"
+    }
+  },
+  "visual_enhancers": {
+    "textures": {
+      "grid_pattern": "bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]",
+      "noise": "opacity-5 mix-blend-overlay"
+    },
+    "micro_interactions": {
+      "hover_lift": "hover:-translate-y-0.5 transition-transform duration-200",
+      "active_press": "active:scale-[0.98]"
+    }
+  },
+  "images": {
+    "hero_login": {
+      "url": "https://images.unsplash.com/photo-1549047608-55b2fd4b8427?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBjYXIlMjB3b3Jrc2hvcCUyMG1lY2hhbmljJTIwZGFyayUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzcxNDY4MDE5fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Red Abarth on lift in dark workshop",
+      "usage": "Full screen background for Login Page with heavy overlay (bg-black/80)"
+    },
+    "dashboard_bg": {
+      "url": "https://images.unsplash.com/photo-1632496497047-706290273235?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzF8MHwxfHNlYXJjaHwyfHxjYXIlMjBlbmdpbmUlMjBwYXJ0cyUyMG1lY2hhbmljJTIwdG9vbHMlMjBhcnRpc3RpY3xlbnwwfHx8fDE3NzE0NjgwMTl8MA&ixlib=rb-4.1.0&q=85",
+      "alt": "Mechanic tools artistic",
+      "usage": "Subtle texture for empty states or profile headers"
+    },
+    "service_default": {
+      "url": "https://images.unsplash.com/photo-1640556795357-71d4078d6228?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzF8MHwxfHNlYXJjaHwzfHxjYXIlMjBlbmdpbmUlMjBwYXJ0cyUyMG1lY2hhbmljJTIwdG9vbHMlMjBhcnRpc3RpY3xlbnwwfHx8fDE3NzE0NjgwMTl8MA&ixlib=rb-4.1.0&q=85",
+      "alt": "Engine parts",
+      "usage": "Default image for Service categories"
+    },
+    "parts_default": {
+      "url": "https://images.unsplash.com/photo-1583126162406-643011b3f69f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBjYXIlMjB3b3Jrc2hvcCUyMG1lY2hhbmljJTIwZGFyayUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzcxNDY4MDE5fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Red tool cart",
+      "usage": "Default image for Parts inventory"
+    }
+  },
+  "instructions_to_main_agent": [
+    "PHASE 1: SETUP. Install 'lucide-react' for icons. Add the Google Fonts link to index.html. Configure Tailwind with the colors above.",
+    "PHASE 2: COMPONENTS. Customize standard Shadcn components. Remove rounded-md, change to rounded-sm. Force dark mode styles by default.",
+    "PHASE 3: LOGIN. Create a high-impact login page using the 'hero_login' image. Admin user: ibs / ibs1234. Form must be centered, glass-morphism (solid bg-zinc-950/90).",
+    "PHASE 4: LAYOUT. Build the Sidebar Navigation (Left, fixed, w-64, bg-zinc-950, border-r border-zinc-800). Main content area (bg-zinc-900).",
+    "PHASE 5: PAGES. Implement Dashboard (Stats), Clients (Table), Vehicles (Grid/List), Calendar (Full size), Quotes (Document view).",
+    "CRITICAL: Use 'data-testid' on ALL interactive elements.",
+    "CRITICAL: No light mode. This is a dark-mode only app for workshops.",
+    "CRITICAL: Use 'sonner' for notifications (success/error toasts)."
+  ],
+  "accessibility": {
+    "contrast": "Ensure text is #FAFAFA (Zinc 50) on dark backgrounds. Muted text #A1A1AA (Zinc 400).",
+    "focus_states": "Visible focus ring using standard Tailwind ring-2 ring-red-600 ring-offset-2 ring-offset-zinc-950."
+  },
+  "tech_stack_specifics": {
+    "charts": "Use Recharts. Style the tooltip to be bg-zinc-900 border-zinc-800 text-zinc-50.",
+    "icons": "Lucide React. Stroke width 1.5px for UI, 2px for Actions.",
+    "date_handling": "Use date-fns for formatting."
+  },
+  "UNIVERSAL_GUIDELINES": {
+    "design_philosophy": "Function over form, but form must look 'Engineered'. Think 'Snap-on Tools' aesthetic.",
+    "animation_policy": "Fast transitions (150ms). No slow fades.",
+    "code_style": "Clean React Functional Components. Hooks for logic."
+  }
+}
