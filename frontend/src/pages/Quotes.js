@@ -264,7 +264,7 @@ export default function Quotes() {
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
                     <span className="text-zinc-500">Cliente:</span>
-                    <span className="text-zinc-200">{getClientName(quote.client_id)}</span>
+                    <span className="text-zinc-200 font-medium">{getClientName(quote.client_id)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-zinc-500">Veículo:</span>
@@ -274,6 +274,12 @@ export default function Quotes() {
                     <span className="text-zinc-500">Itens:</span>
                     <span className="text-zinc-200">{quote.items.length}</span>
                   </div>
+                  {quote.labor_cost > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-zinc-500">Mão de Obra:</span>
+                      <span className="text-green-400 font-mono">R$ {quote.labor_cost.toFixed(2)}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="border-t border-zinc-800 pt-4 mb-4">
