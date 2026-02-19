@@ -440,7 +440,7 @@ async def get_quotes(username: str = Depends(verify_token)):
 @api_router.post("/quotes", response_model=Quote)
 async def create_quote(quote_data: QuoteCreate, username: str = Depends(verify_token)):
     subtotal = sum(item.total for item in quote_data.items)
-    total = subtotal - quote_data.discount
+    total = subtotal + quote_data.labor_cost - quote_data.discount
     
     quote = Quote(
         **quote_data.model_dump(),
@@ -457,7 +457,7 @@ async def create_quote(quote_data: QuoteCreate, username: str = Depends(verify_t
 @api_router.put("/quotes/{quote_id}", response_model=Quote)
 async def update_quote(quote_id: str, quote_data: QuoteCreate, username: str = Depends(verify_token)):
     subtotal = sum(item.total for item in quote_data.items)
-    total = subtotal - quote_data.discount
+    total = subtotal + quote_data.labor_cost - quote_data.discount
     
     update_data = quote_data.model_dump()
     update_data['subtotal'] = subtotal
