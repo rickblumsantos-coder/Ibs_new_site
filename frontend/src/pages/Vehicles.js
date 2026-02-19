@@ -211,62 +211,109 @@ export default function Vehicles() {
           </div>
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-800 rounded-sm overflow-hidden">
+        <div className="space-y-4">
           {loading ? (
             <div className="text-center py-12 text-zinc-500">Carregando...</div>
           ) : filteredVehicles.length === 0 ? (
             <div className="text-center py-12 text-zinc-500">Nenhum veículo encontrado</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full" data-testid="vehicles-table">
-                <thead>
-                  <tr className="bg-zinc-900/50 text-zinc-400 uppercase text-xs font-bold tracking-wider h-10">
-                    <th className="text-left px-4">Placa</th>
-                    <th className="text-left px-4">Marca</th>
-                    <th className="text-left px-4">Modelo</th>
-                    <th className="text-left px-4">Ano</th>
-                    <th className="text-left px-4">Cliente</th>
-                    <th className="text-right px-4">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredVehicles.map((vehicle) => (
-                    <tr
-                      key={vehicle.id}
-                      className="border-b border-zinc-800 hover:bg-zinc-900/50 transition-colors h-12"
-                    >
-                      <td className="text-sm text-zinc-200 px-4 font-mono font-bold uppercase">{vehicle.license_plate}</td>
-                      <td className="text-sm text-zinc-200 px-4">{vehicle.brand}</td>
-                      <td className="text-sm text-zinc-200 px-4">{vehicle.model}</td>
-                      <td className="text-sm text-zinc-200 px-4 font-mono">{vehicle.year}</td>
-                      <td className="text-sm text-zinc-200 px-4">{getClientName(vehicle.client_id)}</td>
-                      <td className="px-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            onClick={() => handleEdit(vehicle)}
-                            variant="ghost"
-                            size="sm"
-                            className="hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-sm"
-                            data-testid={`edit-vehicle-${vehicle.id}`}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            onClick={() => handleDelete(vehicle.id)}
-                            variant="ghost"
-                            size="sm"
-                            className="hover:bg-red-950 text-red-400 hover:text-red-300 rounded-sm"
-                            data-testid={`delete-vehicle-${vehicle.id}`}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+            Object.entries(vehiclesByBrand).map(([brand, brandVehicles]) => (
+              <div key={brand} className="bg-zinc-900 border border-zinc-800 rounded-sm overflow-hidden">
+                {/* Header da marca */}
+                <button
+                  onClick={() => toggleBrand(brand)}
+                  className="w-full flex items-center justify-between px-4 py-3 bg-zinc-900/80 hover:bg-zinc-800/50 transition-colors"
+                  data-testid={`brand-header-${brand}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Car className="w-5 h-5 text-red-500" />
+                    <span className="text-lg font-heading font-bold uppercase text-zinc-50">{brand}</span>
+                    <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-sm">
+                      {brandVehicles.length} {brandVehicles.length === 1 ? 'veículo' : 'veículos'}
+                    </span>
+                  </div>
+                  {expandedBrands[brand] ? (
+                    <ChevronDown className="w-5 h-5 text-zinc-400" />
+                  ) : (
+                    <ChevronRight className="w-5 h-5 text-zinc-400" />
+                  )}
+                </button>
+                
+                {/* Lista de veículos da marca */}
+                {expandedBrands[brand] && (
+                  <div className="divide-y divide-zinc-800">
+                    {brandVehicles.map((vehicle) => (
+                      <div
+                        key={vehicle.id}
+                        className="p-4 hover:bg-zinc-900/50 transition-colors"
+                        data-testid={`vehicle-card-${vehicle.id}`}
+                      >
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                          <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4">
+                            {/* Info principal */}
+                            <div>
+                              <div className="text-xs text-zinc-500 uppercase mb-1">Placa</div>
+                              <div className="text-lg font-mono font-bold text-red-500">{vehicle.license_plate}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-zinc-500 uppercase mb-1">Modelo</div>
+                              <div className="text-sm text-zinc-200 font-medium">{vehicle.model}</div>
+                              <div className="text-xs text-zinc-500">{vehicle.year}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-zinc-500 uppercase mb-1">Cliente</div>
+                              <div className="text-sm text-zinc-200">{getClientName(vehicle.client_id)}</div>
+                            </div>
+                            {/* Especificações */}
+                            <div>
+                              <div className="text-xs text-zinc-500 uppercase mb-1">Especificações</div>
+                              <div className="flex flex-wrap gap-1">
+                                {vehicle.color && (
+                                  <span className="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-sm">{vehicle.color}</span>
+                                )}
+                                {vehicle.transmission && (
+                                  <span className="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-sm">{vehicle.transmission}</span>
+                                )}
+                                {vehicle.fuel_type && (
+                                  <span className="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-sm">{vehicle.fuel_type}</span>
+                                )}
+                                {vehicle.engine && (
+                                  <span className="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-sm">{vehicle.engine}</span>
+                                )}
+                                {vehicle.mileage && (
+                                  <span className="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-sm">{vehicle.mileage.toLocaleString()} km</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          {/* Ações */}
+                          <div className="flex items-center gap-2">
+                            <Button
+                              onClick={() => handleEdit(vehicle)}
+                              variant="ghost"
+                              size="sm"
+                              className="hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-sm"
+                              data-testid={`edit-vehicle-${vehicle.id}`}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              onClick={() => handleDelete(vehicle.id)}
+                              variant="ghost"
+                              size="sm"
+                              className="hover:bg-red-950 text-red-400 hover:text-red-300 rounded-sm"
+                              data-testid={`delete-vehicle-${vehicle.id}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))
           )}
         </div>
 
