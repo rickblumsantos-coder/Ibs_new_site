@@ -110,12 +110,24 @@ class IBSAutoTester:
             "engine": "1.6",
             "notes": "Veículo em bom estado"
         }
-        success, response = self.run_test("Create Vehicle", "POST", "vehicles", 200, vehicle_data)
+        success, response = self.run_test("Create Vehicle with Specifications", "POST", "vehicles", 200, vehicle_data)
         if success and 'id' in response:
             vehicle_id = response['id']
             self.created_data['vehicle_id'] = vehicle_id
             
-            self.run_test("Get Vehicles", "GET", "vehicles", 200)
+            # Verify new fields are properly stored
+            success_get, vehicle_response = self.run_test("Get Vehicles with Specs", "GET", "vehicles", 200)
+            if success_get and vehicle_response:
+                vehicles = vehicle_response.get('data', vehicle_response)
+                if isinstance(vehicles, list) and len(vehicles) > 0:
+                    created_vehicle = next((v for v in vehicles if v.get('id') == vehicle_id), None)
+                    if created_vehicle:
+                        spec_fields = ['transmission', 'fuel_type', 'mileage', 'engine', 'notes']
+                        missing_specs = [field for field in spec_fields if not created_vehicle.get(field)]
+                        if missing_specs:
+                            print(f"❌ Missing specification fields: {missing_specs}")
+                        else:
+                            print(f"✅ All specification fields present: {spec_fields}")
             
             # Get vehicles by client
             self.run_test("Get Vehicles by Client", "GET", f"vehicles/by-client/{self.created_data['client_id']}", 200)
