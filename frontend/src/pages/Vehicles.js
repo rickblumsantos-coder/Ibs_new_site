@@ -56,16 +56,16 @@ export default function Vehicles() {
       const data = { ...formData, year: parseInt(formData.year) };
       if (editingVehicle) {
         await api.updateVehicle(editingVehicle.id, data);
-        toast.success('Ve\u00edculo atualizado com sucesso!');
+        toast.success('Veículo atualizado com sucesso!');
       } else {
         await api.createVehicle(data);
-        toast.success('Ve\u00edculo criado com sucesso!');
+        toast.success('Veículo criado com sucesso!');
       }
       setDialogOpen(false);
       resetForm();
       loadData();
     } catch (error) {
-      toast.error('Erro ao salvar ve\u00edculo');
+      toast.error('Erro ao salvar veículo');
     }
   };
 
@@ -83,13 +83,13 @@ export default function Vehicles() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir este ve\u00edculo?')) {
+    if (window.confirm('Tem certeza que deseja excluir este veículo?')) {
       try {
         await api.deleteVehicle(id);
-        toast.success('Ve\u00edculo exclu\u00eddo com sucesso!');
+        toast.success('Veículo excluído com sucesso!');
         loadData();
       } catch (error) {
-        toast.error('Erro ao excluir ve\u00edculo');
+        toast.error('Erro ao excluir veículo');
       }
     }
   };
@@ -124,9 +124,9 @@ export default function Vehicles() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div>
             <h1 className="text-4xl font-heading font-bold uppercase tracking-tight text-zinc-50">
-              VE\u00cdCULOS
+              VEÍCULOS
             </h1>
-            <p className="text-zinc-400 text-sm mt-1">Gerencie os ve\u00edculos dos clientes</p>
+            <p className="text-zinc-400 text-sm mt-1">Gerencie os veículos dos clientes</p>
           </div>
           <Button
             onClick={() => {
