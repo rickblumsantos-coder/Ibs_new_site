@@ -107,13 +107,29 @@ export default function Services() {
           </Button>
         </div>
 
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+            <Input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar por nome ou descrição..."
+              className="pl-10 bg-zinc-950 border-zinc-800 focus:border-red-600 focus:ring-1 focus:ring-red-600 rounded-sm"
+              data-testid="services-search-input"
+            />
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {loading ? (
             <div className="col-span-full text-center py-12 text-zinc-500">Carregando...</div>
-          ) : services.length === 0 ? (
-            <div className="col-span-full text-center py-12 text-zinc-500">Nenhum serviço encontrado</div>
+          ) : filteredServices.length === 0 ? (
+            <div className="col-span-full text-center py-12 text-zinc-500">
+              {searchTerm ? 'Nenhum serviço encontrado para esta busca' : 'Nenhum serviço encontrado'}
+            </div>
           ) : (
-            services.map((service) => (
+            filteredServices.map((service) => (
               <div
                 key={service.id}
                 className="bg-zinc-900 border border-zinc-800 rounded-sm p-5 hover:border-zinc-700 transition-colors"
