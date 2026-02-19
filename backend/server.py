@@ -581,9 +581,13 @@ async def generate_quote_pdf(quote_id: str, username: str = Depends(verify_token
     
     totals_data = [
         ['Subtotal:', f"R$ {quote['subtotal']:.2f}"],
-        ['Desconto:', f"R$ {quote['discount']:.2f}"],
-        ['TOTAL:', f"R$ {quote['total']:.2f}"]
     ]
+    
+    if quote.get('labor_cost', 0) > 0:
+        totals_data.append(['Mão de Obra:', f"R$ {quote['labor_cost']:.2f}"])
+    
+    totals_data.append(['Desconto:', f"R$ {quote['discount']:.2f}"])
+    totals_data.append(['TOTAL:', f"R$ {quote['total']:.2f}"])
     
     totals_table = Table(totals_data, colWidths=[4.8*inch, 1.8*inch])
     totals_table.setStyle(TableStyle([
