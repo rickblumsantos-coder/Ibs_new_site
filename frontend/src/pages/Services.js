@@ -15,6 +15,16 @@ export default function Services() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingService, setEditingService] = useState(null);
   const [formData, setFormData] = useState({ name: '', description: '', default_price: '' });
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredServices = useMemo(() => {
+    if (!searchTerm.trim()) return services;
+    const term = searchTerm.toLowerCase();
+    return services.filter((service) =>
+      service.name.toLowerCase().includes(term) ||
+      (service.description && service.description.toLowerCase().includes(term))
+    );
+  }, [services, searchTerm]);
 
   useEffect(() => {
     loadServices();

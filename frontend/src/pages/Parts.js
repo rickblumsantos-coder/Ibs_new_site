@@ -15,6 +15,16 @@ export default function Parts() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPart, setEditingPart] = useState(null);
   const [formData, setFormData] = useState({ name: '', description: '', price: '', stock: '0' });
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredParts = useMemo(() => {
+    if (!searchTerm.trim()) return parts;
+    const term = searchTerm.toLowerCase();
+    return parts.filter((part) =>
+      part.name.toLowerCase().includes(term) ||
+      (part.description && part.description.toLowerCase().includes(term))
+    );
+  }, [parts, searchTerm]);
 
   useEffect(() => {
     loadParts();
