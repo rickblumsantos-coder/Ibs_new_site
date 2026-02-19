@@ -468,6 +468,17 @@ export default function Quotes() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase text-zinc-500">Mão de Obra (R$)</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={formData.labor_cost}
+                      onChange={(e) => setFormData({ ...formData, labor_cost: e.target.value })}
+                      className="bg-zinc-950 border-zinc-800 rounded-sm font-mono"
+                      data-testid="labor-cost-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase text-zinc-500">Desconto (R$)</Label>
                     <Input
                       type="number"
@@ -478,14 +489,30 @@ export default function Quotes() {
                       data-testid="discount-input"
                     />
                   </div>
-                  <div className="flex flex-col justify-end">
-                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-sm p-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-zinc-500 uppercase font-semibold">TOTAL</span>
-                        <span className="text-2xl font-mono font-bold text-red-600">
-                          R$ {calculateTotal().toFixed(2)}
-                        </span>
+                </div>
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-sm p-3">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-zinc-500">Subtotal:</span>
+                      <span className="font-mono text-zinc-300">R$ {calculateSubtotal().toFixed(2)}</span>
+                    </div>
+                    {parseFloat(formData.labor_cost) > 0 && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-zinc-500">Mão de Obra:</span>
+                        <span className="font-mono text-green-400">+ R$ {parseFloat(formData.labor_cost || 0).toFixed(2)}</span>
                       </div>
+                    )}
+                    {parseFloat(formData.discount) > 0 && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-zinc-500">Desconto:</span>
+                        <span className="font-mono text-red-400">- R$ {parseFloat(formData.discount || 0).toFixed(2)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-center pt-2 border-t border-zinc-700 mt-1">
+                      <span className="text-xs text-zinc-500 uppercase font-semibold">TOTAL</span>
+                      <span className="text-2xl font-mono font-bold text-red-600">
+                        R$ {calculateTotal().toFixed(2)}
+                      </span>
                     </div>
                   </div>
                 </div>
