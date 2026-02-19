@@ -5,40 +5,43 @@ Sistema de gestão de oficina mecânica com funcionalidades para gerenciamento d
 
 ## Alterações Implementadas (19/02/2026)
 
-### 1. Barra de Pesquisa - Peças e Serviços
-- Adicionada barra de pesquisa na página de Peças (Parts.js)
-- Adicionada barra de pesquisa na página de Serviços (Services.js)
-- Filtro por nome e descrição em tempo real
-- Implementado com useMemo para performance
+### Sessão 1 - Melhorias Iniciais
+1. **Barra de pesquisa** adicionada nas páginas de Peças e Serviços (filtro por nome/descrição)
+2. **Título "VEÍCULOS"** corrigido (caracteres Unicode escapados removidos)
+3. **Campo "Mão de Obra"** adicionado nos orçamentos - somado automaticamente ao total
+4. **Nome e veículo do cliente** visíveis nos cards de orçamentos
 
-### 2. Título da Aba Veículos
-- Corrigido caracteres Unicode escapados (\u00ed -> í)
-- Título agora exibe "VEÍCULOS" corretamente
-- Todas as mensagens de toast também corrigidas
+### Sessão 2 - Veículos e Orçamentos
+1. **Página de Veículos Reorganizada**:
+   - Veículos agrupados por MARCA (Honda, Toyota, Volkswagen, etc.)
+   - Headers colapsáveis para cada marca
+   - Contador de veículos por marca
 
-### 3. Campo Mão de Obra (Orçamentos)
-- Adicionado campo `labor_cost` no backend (Quote model)
-- Adicionado campo "Mão de Obra" no formulário de orçamento
-- Cálculo automático: Total = Subtotal + Mão de Obra - Desconto
-- Exibição do valor de mão de obra nos cards de orçamento
-- PDF do orçamento inclui linha de Mão de Obra quando > 0
+2. **Novos Campos de Especificação de Veículo**:
+   - Câmbio (Manual, Automático, CVT, Automatizado)
+   - Combustível (Gasolina, Etanol, Flex, Diesel, Elétrico, Híbrido, GNV)
+   - Motor (1.0, 1.6, 2.0, etc.)
+   - Quilometragem
+   - Observações
 
-### 4. Nome e Veículo nos Orçamentos
-- Cards de orçamento exibem nome do cliente em destaque
-- Cards de orçamento exibem informações do veículo (Marca Modelo - Placa)
-- Funciona para todos os status: Pendente, Aprovado, Rejeitado, Concluído
+3. **Busca de Veículo nos Orçamentos**:
+   - Campo de busca com autocomplete
+   - Filtro por marca, modelo, placa ou nome do cliente
+   - Dropdown com resultados agrupados por marca
+   - Seleção automática do cliente ao escolher veículo
 
 ## Arquitetura
 
 ### Frontend (React)
 - `/app/frontend/src/pages/Parts.js` - Gestão de peças com busca
 - `/app/frontend/src/pages/Services.js` - Gestão de serviços com busca
-- `/app/frontend/src/pages/Vehicles.js` - Gestão de veículos
-- `/app/frontend/src/pages/Quotes.js` - Gestão de orçamentos com mão de obra
+- `/app/frontend/src/pages/Vehicles.js` - Gestão de veículos por marca
+- `/app/frontend/src/pages/Quotes.js` - Gestão de orçamentos com busca de veículo
 
 ### Backend (FastAPI + MongoDB)
 - `/app/backend/server.py` - API REST com endpoints CRUD
-- Modelo Quote atualizado com campo `labor_cost`
+- Modelo Vehicle: campos de especificação (transmission, fuel_type, mileage, engine, notes)
+- Modelo Quote: campo labor_cost para mão de obra
 
 ## Credenciais
 - Usuário: `ibs`
