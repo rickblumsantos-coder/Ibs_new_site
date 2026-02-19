@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { api } from '@/utils/api';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, FileText, Download, Check, X as XIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, FileText, Download, Check, X as XIcon, Search, Car } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -21,6 +21,8 @@ export default function Quotes() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingQuote, setEditingQuote] = useState(null);
+  const [vehicleSearch, setVehicleSearch] = useState('');
+  const [showVehicleDropdown, setShowVehicleDropdown] = useState(false);
   const [formData, setFormData] = useState({
     client_id: '',
     vehicle_id: '',
