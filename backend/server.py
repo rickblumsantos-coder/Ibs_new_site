@@ -149,6 +149,7 @@ class Quote(BaseModel):
     items: List[QuoteItem]
     subtotal: float
     discount: float = 0
+    labor_cost: float = 0
     total: float
     status: Literal["pending", "approved", "rejected", "completed"] = "pending"
     notes: Optional[str] = None
@@ -160,6 +161,7 @@ class QuoteCreate(BaseModel):
     vehicle_id: str
     items: List[QuoteItem]
     discount: float = 0
+    labor_cost: float = 0
     notes: Optional[str] = None
 
 class Settings(BaseModel):
