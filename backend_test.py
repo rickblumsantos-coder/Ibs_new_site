@@ -92,7 +92,7 @@ class IBSAutoTester:
         return False
 
     def test_vehicle_crud(self):
-        """Test vehicle CRUD operations"""
+        """Test vehicle CRUD operations including new specifications"""
         if 'client_id' not in self.created_data:
             print("❌ Skipping vehicle tests - no client created")
             return False
@@ -103,7 +103,12 @@ class IBSAutoTester:
             "model": "Civic",
             "brand": "Honda", 
             "year": 2020,
-            "color": "Preto"
+            "color": "Preto",
+            "transmission": "Manual",
+            "fuel_type": "Flex",
+            "mileage": 85000,
+            "engine": "1.6",
+            "notes": "Veículo em bom estado"
         }
         success, response = self.run_test("Create Vehicle", "POST", "vehicles", 200, vehicle_data)
         if success and 'id' in response:
