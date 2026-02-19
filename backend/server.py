@@ -590,13 +590,14 @@ async def generate_quote_pdf(quote_id: str, username: str = Depends(verify_token
     totals_data.append(['TOTAL:', f"R$ {quote['total']:.2f}"])
     
     totals_table = Table(totals_data, colWidths=[4.8*inch, 1.8*inch])
+    last_row = len(totals_data) - 1
     totals_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
-        ('FONTNAME', (0, 2), (-1, 2), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 2), (-1, 2), 14),
-        ('TEXTCOLOR', (0, 2), (-1, 2), colors.HexColor('#DC2626')),
-        ('LINEABOVE', (0, 2), (-1, 2), 2, colors.HexColor('#DC2626')),
-        ('TOPPADDING', (0, 2), (-1, 2), 12)
+        ('FONTNAME', (0, last_row), (-1, last_row), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, last_row), (-1, last_row), 14),
+        ('TEXTCOLOR', (0, last_row), (-1, last_row), colors.HexColor('#DC2626')),
+        ('LINEABOVE', (0, last_row), (-1, last_row), 2, colors.HexColor('#DC2626')),
+        ('TOPPADDING', (0, last_row), (-1, last_row), 12)
     ]))
     
     story.append(totals_table)
