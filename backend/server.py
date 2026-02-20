@@ -151,6 +151,8 @@ class QuoteItem(BaseModel):
     type: Literal["service", "part"]
     item_id: str
     name: str
+    description: Optional[str] = None   # Descrição do item
+    distributor: Optional[str] = None   # Distribuidora (para peças)
     quantity: int
     unit_price: float
     total: float
@@ -165,10 +167,13 @@ class Quote(BaseModel):
     discount: float = 0
     labor_cost: float = 0
     total: float
-    status: Literal["pending", "approved", "rejected", "completed"] = "pending"
+    installments: int = 1               # Número de parcelas
+    installment_value: float = 0        # Valor de cada parcela
+    status: Literal["pending", "approved", "rejected", "completed", "in_progress"] = "pending"
     notes: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     approved_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
 
 class QuoteCreate(BaseModel):
     client_id: str
@@ -176,7 +181,18 @@ class QuoteCreate(BaseModel):
     items: List[QuoteItem]
     discount: float = 0
     labor_cost: float = 0
+    installments: int = 1
     notes: Optional[str] = None
+
+class QuoteUpdate(BaseModel):
+    client_id: Optional[str] = None
+    vehicle_id: Optional[str] = None
+    items: Optional[List[QuoteItem]] = None
+    discount: Optional[float] = None
+    labor_cost: Optional[float] = None
+    installments: Optional[int] = None
+    notes: Optional[str] = None
+    status: Optional[Literal["pending", "approved", "rejected", "completed", "in_progress"]] = None
 
 class Settings(BaseModel):
     model_config = ConfigDict(extra="ignore")
