@@ -341,6 +341,39 @@ async def delete_vehicle(vehicle_id: str, username: str = Depends(verify_token))
         raise HTTPException(status_code=404, detail="Vehicle not found")
     return {"message": "Vehicle deleted successfully"}
 
+@api_router.get("/vehicles/{vehicle_id}/history")
+async def get_vehicle_history(vehicle_id: str, username: str = Depends(verify_token)):
+    """Get maintenance history for a specific vehicle"""
+    # Get vehicle info
+    vehicle = await db.vehicles.find_one({"id": vehicle_id}, {"_id": 0})
+    if not vehicle:
+        raise HTTPException(status_code=404, detail="Vehicle not found")
+    
+    # Get all quotes for this vehicle
+    quotes = await db.quotes.find({"vehicle_id": vehicle_id}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    # Get client info
+    client = await db.clients.find_one({"id": vehicle.get('client_id')}, {"_id": 0})
+    
+    # Process quotes
+    history = []
+    for quote in quotes:
+        if isinstance(quote.get('created_at'), str):
+            quote['created_at'] = datetime.fromisoformat(quote['created_at'])
+        if quote.get('approved_at') and isinstance(quote['approved_at'], str):
+            quote['approved_at'] = datetime.fromisoformat(quote['approved_at'])
+        if quote.get('completed_at') and isinstance(quote['completed_at'], str):
+            quote['completed_at'] = datetime.fromisoformat(quote['completed_at'])
+        history.append(quote)
+    
+    return {
+        "vehicle": vehicle,
+        "client": client,
+        "history": history,
+        "total_services": len(history),
+        "total_spent": sum(q.get('total', 0) for q in history if q.get('status') in ['approved', 'completed'])
+    }
+
 # ===== SERVICE ROUTES =====
 
 @api_router.get("/services", response_model=List[Service])
