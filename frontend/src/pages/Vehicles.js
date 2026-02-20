@@ -299,6 +299,9 @@ export default function Vehicles() {
                                 {vehicle.engine && (
                                   <span className="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-sm">{vehicle.engine}</span>
                                 )}
+                                {vehicle.valves && (
+                                  <span className="text-xs bg-red-900/50 text-red-300 px-2 py-0.5 rounded-sm">{vehicle.valves}</span>
+                                )}
                                 {vehicle.mileage && (
                                   <span className="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-sm">{vehicle.mileage.toLocaleString()} km</span>
                                 )}
@@ -307,6 +310,16 @@ export default function Vehicles() {
                           </div>
                           {/* Ações */}
                           <div className="flex items-center gap-2">
+                            <Button
+                              onClick={() => handleViewHistory(vehicle)}
+                              variant="ghost"
+                              size="sm"
+                              className="hover:bg-blue-950 text-blue-400 hover:text-blue-300 rounded-sm"
+                              data-testid={`history-vehicle-${vehicle.id}`}
+                              title="Ver histórico"
+                            >
+                              <History className="w-4 h-4" />
+                            </Button>
                             <Button
                               onClick={() => handleEdit(vehicle)}
                               variant="ghost"
