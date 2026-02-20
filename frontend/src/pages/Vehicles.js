@@ -143,9 +143,6 @@ export default function Vehicles() {
       notes: '',
     });
   };
-      notes: '',
-    });
-  };
 
   const getClientName = (clientId) => {
     const client = clients.find((c) => c.id === clientId);
@@ -156,6 +153,8 @@ export default function Vehicles() {
     vehicle.license_plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
     vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
     vehicle.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (vehicle.valves && vehicle.valves.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (vehicle.engine && vehicle.engine.toLowerCase().includes(searchTerm.toLowerCase())) ||
     getClientName(vehicle.client_id).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
