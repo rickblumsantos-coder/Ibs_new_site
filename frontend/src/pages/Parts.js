@@ -7,14 +7,15 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Package, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Package, Search, ChevronDown, ChevronRight } from 'lucide-react';
 
 export default function Parts() {
   const [parts, setParts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPart, setEditingPart] = useState(null);
-  const [formData, setFormData] = useState({ name: '', description: '', price: '', stock: '0' });
+  const [expandedDistributors, setExpandedDistributors] = useState({});
+  const [formData, setFormData] = useState({ name: '', description: '', distributor: '', price: '', stock: '0' });
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredParts = useMemo(() => {
@@ -22,9 +23,44 @@ export default function Parts() {
     const term = searchTerm.toLowerCase();
     return parts.filter((part) =>
       part.name.toLowerCase().includes(term) ||
-      (part.description && part.description.toLowerCase().includes(term))
+      (part.description && part.description.toLowerCase().includes(term)) ||
+      (part.distributor && part.distributor.toLowerCase().includes(term))
     );
   }, [parts, searchTerm]);
+
+  // Agrupar peças por distribuidora
+  const partsByDistributor = useMemo(() => {
+    const grouped = {};
+    filteredParts.forEach((part) => {
+      const distributor = (part.distributor || 'Geral').toUpperCase();
+      if (!grouped[distributor]) {
+        grouped[distributor] = [];
+      }
+      grouped[distributor].push(part);
+    });
+    return Object.keys(grouped)
+      .sort()
+      .reduce((acc, key) => {
+        acc[key] = grouped[key];
+        return acc;
+      }, {});
+  }, [filteredParts]);
+
+  const toggleDistributor = (distributor) => {
+    setExpandedDistributors((prev) => ({
+      ...prev,
+      [distributor]: !prev[distributor],
+    }));
+  };
+
+  // Expandir todas as distribuidoras por padrão
+  useEffect(() => {
+    const allDistributors = {};
+    Object.keys(partsByDistributor).forEach((dist) => {
+      allDistributors[dist] = true;
+    });
+    setExpandedDistributors(allDistributors);
+  }, [parts]);
 
   useEffect(() => {
     loadParts();
