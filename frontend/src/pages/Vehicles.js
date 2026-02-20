@@ -595,6 +595,115 @@ export default function Vehicles() {
             </form>
           </DialogContent>
         </Dialog>
+
+        {/* Dialog de Histórico de Manutenções */}
+        <Dialog open={historyDialogOpen} onOpenChange={setHistoryDialogOpen}>
+          <DialogContent className="bg-zinc-950 border-zinc-800 text-zinc-50 max-w-3xl max-h-[90vh] overflow-y-auto" data-testid="history-dialog">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-heading font-bold uppercase">
+                HISTÓRICO DE MANUTENÇÕES
+              </DialogTitle>
+            </DialogHeader>
+            {selectedVehicleHistory && (
+              <div className="space-y-4 py-4">
+                {/* Info do Veículo */}
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-sm p-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <div className="text-xs text-zinc-500 uppercase">Veículo</div>
+                      <div className="text-sm font-medium text-zinc-200">
+                        {selectedVehicleHistory.vehicle?.brand} {selectedVehicleHistory.vehicle?.model}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-zinc-500 uppercase">Placa</div>
+                      <div className="text-lg font-mono font-bold text-red-500">
+                        {selectedVehicleHistory.vehicle?.license_plate}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-zinc-500 uppercase">Cliente</div>
+                      <div className="text-sm text-zinc-200">{selectedVehicleHistory.client?.name || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-zinc-500 uppercase">Total Gasto</div>
+                      <div className="text-lg font-mono font-bold text-green-500">
+                        R$ {selectedVehicleHistory.total_spent?.toFixed(2) || '0.00'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Lista de Orçamentos */}
+                <div>
+                  <h3 className="text-sm font-semibold uppercase text-zinc-400 mb-3">
+                    Serviços Realizados ({selectedVehicleHistory.total_services || 0})
+                  </h3>
+                  {selectedVehicleHistory.history?.length === 0 ? (
+                    <div className="text-center py-8 text-zinc-500">
+                      Nenhum serviço registrado para este veículo
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {selectedVehicleHistory.history?.map((quote) => (
+                        <div
+                          key={quote.id}
+                          className="bg-zinc-900 border border-zinc-800 rounded-sm p-4 hover:border-zinc-700 transition-colors"
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <span className="text-xs font-mono text-zinc-500">
+                                #{quote.id.substring(0, 8)}
+                              </span>
+                              <span className="text-xs text-zinc-500 ml-2">
+                                {format(new Date(quote.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                              </span>
+                            </div>
+                            <span className={`text-xs px-2 py-0.5 rounded-sm font-semibold uppercase ${
+                              quote.status === 'completed' ? 'bg-green-900/50 text-green-400' :
+                              quote.status === 'approved' ? 'bg-blue-900/50 text-blue-400' :
+                              quote.status === 'rejected' ? 'bg-red-900/50 text-red-400' :
+                              quote.status === 'in_progress' ? 'bg-yellow-900/50 text-yellow-400' :
+                              'bg-zinc-800 text-zinc-400'
+                            }`}>
+                              {quote.status === 'completed' ? 'Concluído' :
+                               quote.status === 'approved' ? 'Aprovado' :
+                               quote.status === 'rejected' ? 'Rejeitado' :
+                               quote.status === 'in_progress' ? 'Em Andamento' : 'Pendente'}
+                            </span>
+                          </div>
+                          <div className="text-sm text-zinc-300 mb-2">
+                            {quote.items?.map((item, idx) => (
+                              <span key={idx}>
+                                {item.name}{idx < quote.items.length - 1 ? ', ' : ''}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-zinc-500">
+                              {quote.items?.length || 0} {quote.items?.length === 1 ? 'item' : 'itens'}
+                            </span>
+                            <span className="text-lg font-mono font-bold text-red-500">
+                              R$ {quote.total?.toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button
+                onClick={() => setHistoryDialogOpen(false)}
+                className="bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded-sm"
+              >
+                FECHAR
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );
