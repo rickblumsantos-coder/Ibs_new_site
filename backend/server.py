@@ -82,6 +82,7 @@ class Vehicle(BaseModel):
     fuel_type: Optional[str] = None     # Gasolina, Etanol, Flex, Diesel, Elétrico, Híbrido
     mileage: Optional[int] = None       # Quilometragem
     engine: Optional[str] = None        # Motor (1.0, 1.6, 2.0, etc.)
+    valves: Optional[str] = None        # Válvulas (8v, 16v, 24v, etc.)
     notes: Optional[str] = None         # Observações adicionais
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -96,6 +97,7 @@ class VehicleCreate(BaseModel):
     fuel_type: Optional[str] = None
     mileage: Optional[int] = None
     engine: Optional[str] = None
+    valves: Optional[str] = None
     notes: Optional[str] = None
 
 class Service(BaseModel):
