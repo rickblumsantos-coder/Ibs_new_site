@@ -98,9 +98,20 @@ export default function Vehicles() {
       fuel_type: vehicle.fuel_type || '',
       mileage: vehicle.mileage || '',
       engine: vehicle.engine || '',
+      valves: vehicle.valves || '',
       notes: vehicle.notes || '',
     });
     setDialogOpen(true);
+  };
+
+  const handleViewHistory = async (vehicle) => {
+    try {
+      const response = await api.getVehicleHistory(vehicle.id);
+      setSelectedVehicleHistory(response.data);
+      setHistoryDialogOpen(true);
+    } catch (error) {
+      toast.error('Erro ao carregar histórico');
+    }
   };
 
   const handleDelete = async (id) => {
