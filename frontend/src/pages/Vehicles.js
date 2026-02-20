@@ -139,6 +139,10 @@ export default function Vehicles() {
       fuel_type: '',
       mileage: '',
       engine: '',
+      valves: '',
+      notes: '',
+    });
+  };
       notes: '',
     });
   };
