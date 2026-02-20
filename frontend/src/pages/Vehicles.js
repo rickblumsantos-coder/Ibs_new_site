@@ -532,6 +532,25 @@ export default function Vehicles() {
                         data-testid="vehicle-mileage-input"
                       />
                     </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="valves" className="text-xs font-semibold uppercase text-zinc-500">
+                        Válvulas
+                      </Label>
+                      <Select
+                        value={formData.valves}
+                        onValueChange={(value) => setFormData({ ...formData, valves: value })}
+                      >
+                        <SelectTrigger className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm" data-testid="vehicle-valves-select">
+                          <SelectValue placeholder="Selecione as válvulas" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-zinc-950 border-zinc-800">
+                          <SelectItem value="8v">8 Válvulas (8v)</SelectItem>
+                          <SelectItem value="16v">16 Válvulas (16v)</SelectItem>
+                          <SelectItem value="24v">24 Válvulas (24v)</SelectItem>
+                          <SelectItem value="32v">32 Válvulas (32v)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
 
