@@ -798,10 +798,7 @@ async def get_dashboard_stats(username: str = Depends(verify_token)):
         recent_appointments=recent_appointments
     )
 
-origins = [
-    "https://ibs-new-site.vercel.app"
-]
-
+origins = os.environ.get("CORS_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,  # Frontend permitido
