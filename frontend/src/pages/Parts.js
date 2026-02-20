@@ -255,17 +255,6 @@ export default function Parts() {
               </div>
             ))
           )}
-                  <div className="text-right">
-                    <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Estoque</div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg font-mono font-bold text-zinc-200">{part.stock}</span>
-                      {getStockBadge(part.stock)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
         </div>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -289,13 +278,25 @@ export default function Parts() {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="distributor" className="text-xs font-semibold uppercase text-zinc-500">Distribuidora *</Label>
+                  <Input
+                    id="distributor"
+                    value={formData.distributor}
+                    onChange={(e) => setFormData({ ...formData, distributor: e.target.value })}
+                    placeholder="Ex: Cofap, Bosch, Original..."
+                    required
+                    className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
+                    data-testid="part-distributor-input"
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="description" className="text-xs font-semibold uppercase text-zinc-500">Descrição</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
-                    rows={3}
+                    rows={2}
                     data-testid="part-description-input"
                   />
                 </div>
