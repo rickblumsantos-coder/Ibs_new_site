@@ -162,62 +162,99 @@ export default function Parts() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar por nome ou descrição..."
+              placeholder="Buscar por nome, descrição ou distribuidora..."
               className="pl-10 bg-zinc-950 border-zinc-800 focus:border-red-600 focus:ring-1 focus:ring-red-600 rounded-sm"
               data-testid="parts-search-input"
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="space-y-4">
           {loading ? (
-            <div className="col-span-full text-center py-12 text-zinc-500">Carregando...</div>
+            <div className="text-center py-12 text-zinc-500">Carregando...</div>
           ) : filteredParts.length === 0 ? (
-            <div className="col-span-full text-center py-12 text-zinc-500">
+            <div className="text-center py-12 text-zinc-500">
               {searchTerm ? 'Nenhuma peça encontrada para esta busca' : 'Nenhuma peça encontrada'}
             </div>
           ) : (
-            filteredParts.map((part) => (
-              <div
-                key={part.id}
-                className="bg-zinc-900 border border-zinc-800 rounded-sm p-5 hover:border-zinc-700 transition-colors"
-                data-testid={`part-card-${part.id}`}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Package className="w-5 h-5 text-zinc-500" />
-                    <h3 className="text-lg font-heading font-bold uppercase text-zinc-50">
-                      {part.name}
-                    </h3>
+            Object.entries(partsByDistributor).map(([distributor, distributorParts]) => (
+              <div key={distributor} className="bg-zinc-900 border border-zinc-800 rounded-sm overflow-hidden">
+                {/* Header da distribuidora */}
+                <button
+                  onClick={() => toggleDistributor(distributor)}
+                  className="w-full flex items-center justify-between px-4 py-3 bg-zinc-900/80 hover:bg-zinc-800/50 transition-colors"
+                  data-testid={`distributor-header-${distributor}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Package className="w-5 h-5 text-red-500" />
+                    <span className="text-lg font-heading font-bold uppercase text-zinc-50">{distributor}</span>
+                    <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-sm">
+                      {distributorParts.length} {distributorParts.length === 1 ? 'peça' : 'peças'}
+                    </span>
                   </div>
-                  <div className="flex gap-1">
-                    <Button
-                      onClick={() => handleEdit(part)}
-                      variant="ghost"
-                      size="sm"
-                      className="hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-sm p-1 h-auto"
-                      data-testid={`edit-part-${part.id}`}
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      onClick={() => handleDelete(part.id)}
-                      variant="ghost"
-                      size="sm"
-                      className="hover:bg-red-950 text-red-400 hover:text-red-300 rounded-sm p-1 h-auto"
-                      data-testid={`delete-part-${part.id}`}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                  {expandedDistributors[distributor] ? (
+                    <ChevronDown className="w-5 h-5 text-zinc-400" />
+                  ) : (
+                    <ChevronRight className="w-5 h-5 text-zinc-400" />
+                  )}
+                </button>
+
+                {/* Lista de peças da distribuidora */}
+                {expandedDistributors[distributor] && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                    {distributorParts.map((part) => (
+                      <div
+                        key={part.id}
+                        className="bg-zinc-950/50 border border-zinc-800 rounded-sm p-4 hover:border-zinc-700 transition-colors"
+                        data-testid={`part-card-${part.id}`}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <h3 className="text-base font-heading font-bold uppercase text-zinc-50">
+                            {part.name}
+                          </h3>
+                          <div className="flex gap-1">
+                            <Button
+                              onClick={() => handleEdit(part)}
+                              variant="ghost"
+                              size="sm"
+                              className="hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-sm p-1 h-auto"
+                              data-testid={`edit-part-${part.id}`}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              onClick={() => handleDelete(part.id)}
+                              variant="ghost"
+                              size="sm"
+                              className="hover:bg-red-950 text-red-400 hover:text-red-300 rounded-sm p-1 h-auto"
+                              data-testid={`delete-part-${part.id}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        {part.description && (
+                          <p className="text-xs text-zinc-400 mb-2 line-clamp-2">{part.description}</p>
+                        )}
+                        <div className="flex items-center justify-between">
+                          <div className="text-xl font-mono font-bold text-red-600">
+                            R$ {part.price.toFixed(2)}
+                          </div>
+                          <span className={`text-xs px-2 py-0.5 rounded-sm ${
+                            part.stock > 5 ? 'bg-green-900/50 text-green-400' :
+                            part.stock > 0 ? 'bg-yellow-900/50 text-yellow-400' :
+                            'bg-red-900/50 text-red-400'
+                          }`}>
+                            {part.stock} un.
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-                {part.description && (
-                  <p className="text-sm text-zinc-400 mb-3">{part.description}</p>
                 )}
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-mono font-bold text-red-600">
-                    R$ {part.price.toFixed(2)}
-                  </div>
+              </div>
+            ))
+          )}
                   <div className="text-right">
                     <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Estoque</div>
                     <div className="flex items-center gap-2">
