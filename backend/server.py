@@ -465,43 +465,97 @@ async def get_quotes(username: str = Depends(verify_token)):
             quote['created_at'] = datetime.fromisoformat(quote['created_at'])
         if quote.get('approved_at') and isinstance(quote['approved_at'], str):
             quote['approved_at'] = datetime.fromisoformat(quote['approved_at'])
+        if quote.get('completed_at') and isinstance(quote['completed_at'], str):
+            quote['completed_at'] = datetime.fromisoformat(quote['completed_at'])
     return quotes
 
 @api_router.post("/quotes", response_model=Quote)
 async def create_quote(quote_data: QuoteCreate, username: str = Depends(verify_token)):
     subtotal = sum(item.total for item in quote_data.items)
     total = subtotal + quote_data.labor_cost - quote_data.discount
+    installment_value = total / quote_data.installments if quote_data.installments > 0 else total
     
     quote = Quote(
         **quote_data.model_dump(),
         subtotal=subtotal,
-        total=total
+        total=total,
+        installment_value=round(installment_value, 2)
     )
     doc = quote.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     if doc.get('approved_at'):
         doc['approved_at'] = doc['approved_at'].isoformat()
+    if doc.get('completed_at'):
+        doc['completed_at'] = doc['completed_at'].isoformat()
     await db.quotes.insert_one(doc)
     return quote
 
 @api_router.put("/quotes/{quote_id}", response_model=Quote)
-async def update_quote(quote_id: str, quote_data: QuoteCreate, username: str = Depends(verify_token)):
-    subtotal = sum(item.total for item in quote_data.items)
-    total = subtotal + quote_data.labor_cost - quote_data.discount
+async def update_quote(quote_id: str, quote_data: QuoteUpdate, username: str = Depends(verify_token)):
+    # Get existing quote
+    existing = await db.quotes.find_one({"id": quote_id}, {"_id": 0})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Quote not found")
     
-    update_data = quote_data.model_dump()
-    update_data['subtotal'] = subtotal
-    update_data['total'] = total
+    update_data = quote_data.model_dump(exclude_none=True)
+    
+    # Recalculate totals if items changed
+    if 'items' in update_data:
+        subtotal = sum(item['total'] for item in update_data['items'])
+        labor_cost = update_data.get('labor_cost', existing.get('labor_cost', 0))
+        discount = update_data.get('discount', existing.get('discount', 0))
+        total = subtotal + labor_cost - discount
+        installments = update_data.get('installments', existing.get('installments', 1))
+        
+        update_data['subtotal'] = subtotal
+        update_data['total'] = total
+        update_data['installment_value'] = round(total / installments, 2) if installments > 0 else total
+    elif 'labor_cost' in update_data or 'discount' in update_data or 'installments' in update_data:
+        subtotal = existing.get('subtotal', 0)
+        labor_cost = update_data.get('labor_cost', existing.get('labor_cost', 0))
+        discount = update_data.get('discount', existing.get('discount', 0))
+        total = subtotal + labor_cost - discount
+        installments = update_data.get('installments', existing.get('installments', 1))
+        
+        update_data['total'] = total
+        update_data['installment_value'] = round(total / installments, 2) if installments > 0 else total
+    
+    # Handle status changes
+    if 'status' in update_data:
+        if update_data['status'] == 'approved' and existing.get('status') != 'approved':
+            update_data['approved_at'] = datetime.now(timezone.utc).isoformat()
+        elif update_data['status'] == 'completed' and existing.get('status') != 'completed':
+            update_data['completed_at'] = datetime.now(timezone.utc).isoformat()
     
     result = await db.quotes.update_one({"id": quote_id}, {"$set": update_data})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Quote not found")
+    
     updated = await db.quotes.find_one({"id": quote_id}, {"_id": 0})
     if isinstance(updated['created_at'], str):
         updated['created_at'] = datetime.fromisoformat(updated['created_at'])
     if updated.get('approved_at') and isinstance(updated['approved_at'], str):
         updated['approved_at'] = datetime.fromisoformat(updated['approved_at'])
+    if updated.get('completed_at') and isinstance(updated['completed_at'], str):
+        updated['completed_at'] = datetime.fromisoformat(updated['completed_at'])
     return Quote(**updated)
+
+@api_router.post("/quotes/{quote_id}/status")
+async def update_quote_status(quote_id: str, status: str, username: str = Depends(verify_token)):
+    valid_statuses = ["pending", "approved", "rejected", "completed", "in_progress"]
+    if status not in valid_statuses:
+        raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {valid_statuses}")
+    
+    update_data = {"status": status}
+    if status == "approved":
+        update_data["approved_at"] = datetime.now(timezone.utc).isoformat()
+    elif status == "completed":
+        update_data["completed_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.quotes.update_one({"id": quote_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Quote not found")
+    return {"message": f"Quote status updated to {status}"}
 
 @api_router.post("/quotes/{quote_id}/approve")
 async def approve_quote(quote_id: str, username: str = Depends(verify_token)):
