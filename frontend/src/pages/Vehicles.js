@@ -14,7 +14,9 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Search, ChevronDown, ChevronRight, Car } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, ChevronDown, ChevronRight, Car, History, FileText } from 'lucide-react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 export default function Vehicles() {
   const [vehicles, setVehicles] = useState([]);
@@ -22,6 +24,8 @@ export default function Vehicles() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+  const [selectedVehicleHistory, setSelectedVehicleHistory] = useState(null);
   const [editingVehicle, setEditingVehicle] = useState(null);
   const [expandedBrands, setExpandedBrands] = useState({});
   const [formData, setFormData] = useState({
@@ -35,6 +39,7 @@ export default function Vehicles() {
     fuel_type: '',
     mileage: '',
     engine: '',
+    valves: '',
     notes: '',
   });
 
