@@ -798,16 +798,20 @@ async def get_dashboard_stats(username: str = Depends(verify_token)):
         recent_appointments=recent_appointments
     )
 
-# Include the router in the main app
-app.include_router(api_router)
+origins = [
+    "https://ibs-new-site.vercel.app"
+]
 
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=origins,  # Frontend permitido
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include the router in the main app
+app.include_router(api_router)
 
 logging.basicConfig(
     level=logging.INFO,
