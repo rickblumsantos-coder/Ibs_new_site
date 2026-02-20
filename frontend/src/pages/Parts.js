@@ -105,6 +105,7 @@ export default function Parts() {
     setFormData({
       name: part.name,
       description: part.description || '',
+      distributor: part.distributor || '',
       price: part.price,
       stock: part.stock,
     });
@@ -125,7 +126,7 @@ export default function Parts() {
 
   const resetForm = () => {
     setEditingPart(null);
-    setFormData({ name: '', description: '', price: '', stock: '0' });
+    setFormData({ name: '', description: '', distributor: '', price: '', stock: '0' });
   };
 
   const getStockBadge = (stock) => {
