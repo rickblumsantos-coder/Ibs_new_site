@@ -12,6 +12,7 @@ export const api = {
   // Vehicles
   getVehicles: () => axios.get(`${API_URL}/vehicles`),
   getVehiclesByClient: (clientId) => axios.get(`${API_URL}/vehicles/by-client/${clientId}`),
+  getVehicleHistory: (id) => axios.get(`${API_URL}/vehicles/${id}/history`),
   createVehicle: (data) => axios.post(`${API_URL}/vehicles`, data),
   updateVehicle: (id, data) => axios.put(`${API_URL}/vehicles/${id}`, data),
   deleteVehicle: (id) => axios.delete(`${API_URL}/vehicles/${id}`),
@@ -38,6 +39,7 @@ export const api = {
   getQuotes: () => axios.get(`${API_URL}/quotes`),
   createQuote: (data) => axios.post(`${API_URL}/quotes`, data),
   updateQuote: (id, data) => axios.put(`${API_URL}/quotes/${id}`, data),
+  updateQuoteStatus: (id, status) => axios.post(`${API_URL}/quotes/${id}/status?status=${status}`),
   deleteQuote: (id) => axios.delete(`${API_URL}/quotes/${id}`),
   approveQuote: (id) => axios.post(`${API_URL}/quotes/${id}/approve`),
   rejectQuote: (id) => axios.post(`${API_URL}/quotes/${id}/reject`),
