@@ -44,7 +44,12 @@ export default function Login() {
             <p className="text-zinc-400 text-sm uppercase tracking-wider">Sistema de Gestão</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6" data-testid="login-form">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6"
+            data-testid="login-form"
+            autoComplete="off"
+          >
             <div className="space-y-2">
               <Label htmlFor="username" className="text-xs font-semibold uppercase text-zinc-500">
                 Usuário
@@ -53,9 +58,14 @@ export default function Login() {
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                 <Input
                   id="username"
+                  name="auth_user"
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   className="pl-10 bg-zinc-950 border-zinc-800 focus:border-red-600 focus:ring-1 focus:ring-red-600 rounded-sm h-10 text-white"
                   placeholder="Digite seu usuário"
                   required
@@ -72,9 +82,11 @@ export default function Login() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                 <Input
                   id="password"
+                  name="auth_pass"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
                   className="pl-10 bg-zinc-950 border-zinc-800 focus:border-red-600 focus:ring-1 focus:ring-red-600 rounded-sm h-10 text-white"
                   placeholder="Digite sua senha"
                   required
@@ -92,10 +104,6 @@ export default function Login() {
               {loading ? 'ENTRANDO...' : 'ENTRAR'}
             </Button>
           </form>
-
-          <div className="mt-6 text-center text-xs text-zinc-600">
-            <p>Credenciais padrão: ibs / ibs1234</p>
-          </div>
         </div>
       </div>
     </div>
