@@ -210,7 +210,7 @@ export default function Quotes() {
       v.license_plate.toLowerCase().includes(term) ||
       getClientName(v.client_id).toLowerCase().includes(term)
     );
-  }, [vehicles, vehicleSearch, clients]);
+  }, [vehicles, vehicleSearch, getClientName]);
 
   // Agrupar veículos filtrados por marca
   const groupedVehicles = useMemo(() => {

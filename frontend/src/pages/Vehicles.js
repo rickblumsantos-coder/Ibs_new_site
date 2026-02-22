@@ -172,7 +172,7 @@ export default function Vehicles() {
       allBrands[brand] = true;
     });
     setExpandedBrands(allBrands);
-  }, [vehicles]);
+  }, [vehiclesByBrand]);
 
   return (
     <Layout>
