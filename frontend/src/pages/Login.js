@@ -48,7 +48,7 @@ export default function Login() {
             onSubmit={handleSubmit}
             className="space-y-6"
             data-testid="login-form"
-            autoComplete="on"
+            autoComplete="off"
           >
             <div className="space-y-2">
               <Label htmlFor="username" className="text-xs font-semibold uppercase text-zinc-500">
