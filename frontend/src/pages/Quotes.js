@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { api } from '@/utils/api';
 import { Button } from '@/components/ui/button';
@@ -186,10 +186,10 @@ export default function Quotes() {
     setVehicleSearch('');
   };
 
-  const getClientName = (clientId) => {
+  const getClientName = useCallback((clientId) => {
     const client = clients.find((c) => c.id === clientId);
     return client ? client.name : 'N/A';
-  };
+  }, [clients]);
 
   const getVehicleInfo = (vehicleId) => {
     const vehicle = vehicles.find((v) => v.id === vehicleId);
