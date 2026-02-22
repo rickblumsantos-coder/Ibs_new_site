@@ -48,7 +48,7 @@ export default function Login() {
             onSubmit={handleSubmit}
             className="space-y-6"
             data-testid="login-form"
-            autoComplete="off"
+            autoComplete="on"
           >
             <div className="space-y-2">
               <Label htmlFor="username" className="text-xs font-semibold uppercase text-zinc-500">
@@ -62,7 +62,7 @@ export default function Login() {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  autoComplete="off"
+                  autoComplete="username"
                   autoCapitalize="none"
                   autoCorrect="off"
                   spellCheck={false}
@@ -86,7 +86,7 @@ export default function Login() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="new-password"
+                  autoComplete="current-password"
                   className="pl-10 bg-zinc-950 border-zinc-800 focus:border-red-600 focus:ring-1 focus:ring-red-600 rounded-sm h-10 text-white"
                   placeholder="Digite sua senha"
                   required
