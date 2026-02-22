@@ -34,7 +34,7 @@ export default function Dashboard() {
       bg: 'bg-blue-950/30',
     },
     {
-      title: 'Total Ve\u00edculos',
+      title: 'Total Veículos',
       value: stats?.total_vehicles || 0,
       icon: Car,
       color: 'text-green-500',
@@ -48,14 +48,14 @@ export default function Dashboard() {
       bg: 'bg-yellow-950/30',
     },
     {
-      title: 'Or\u00e7amentos Pendentes',
+      title: 'Orçamentos Pendentes',
       value: stats?.pending_quotes || 0,
       icon: FileText,
       color: 'text-orange-500',
       bg: 'bg-orange-950/30',
     },
     {
-      title: 'Receita do M\u00eas',
+      title: 'Receita do Mês',
       value: `R$ ${(stats?.monthly_revenue || 0).toFixed(2)}`,
       icon: DollarSign,
       color: 'text-red-500',
@@ -73,7 +73,7 @@ export default function Dashboard() {
     const labels = {
       scheduled: 'Agendado',
       confirmed: 'Confirmado',
-      completed: 'Conclu\u00eddo',
+      completed: 'Concluído',
       cancelled: 'Cancelado',
     };
     return (
@@ -100,7 +100,7 @@ export default function Dashboard() {
           <h1 className="text-4xl font-heading font-bold uppercase tracking-tight text-zinc-50">
             DASHBOARD
           </h1>
-          <p className="text-zinc-400 text-sm mt-1">Vis\u00e3o geral do sistema</p>
+          <p className="text-zinc-400 text-sm mt-1">Visão geral do sistema</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
@@ -142,7 +142,7 @@ export default function Dashboard() {
                   <thead>
                     <tr className="bg-zinc-900/50 text-zinc-400 uppercase text-xs font-bold tracking-wider h-10">
                       <th className="text-left px-4">Cliente</th>
-                      <th className="text-left px-4">Ve\u00edculo</th>
+                      <th className="text-left px-4">Veículo</th>
                       <th className="text-left px-4">Data</th>
                       <th className="text-left px-4">Status</th>
                     </tr>
