@@ -692,7 +692,8 @@ async def get_dashboard_stats(username: str = Depends(verify_token)):
     )
 
 origins = [
-    "https://ibs-new-site-rickblumsantos-coders-projects.vercel.app/"  # URL do seu front no Vercel
+    "https://ibs-new-site-2.vercel.app",
+    "http://localhost:3000",
 ]
 
 app.add_middleware(
