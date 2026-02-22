@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { api } from '@/utils/api';
 import { Button } from '@/components/ui/button';
@@ -90,10 +90,13 @@ export default function Clients() {
     setFormData({ name: '', phone: '', email: '', cpf: '', address: '' });
   };
 
-  const filteredClients = clients.filter((client) =>
-    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.phone.includes(searchTerm) ||
-    (client.email && client.email.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredClients = useMemo(
+    () => clients.filter((client) =>
+      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.phone.includes(searchTerm) ||
+      (client.email && client.email.toLowerCase().includes(searchTerm.toLowerCase()))
+    ),
+    [clients, searchTerm]
   );
 
   return (

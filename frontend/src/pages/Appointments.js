@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { api } from '@/utils/api';
 import { Button } from '@/components/ui/button';
@@ -105,19 +105,28 @@ export default function Appointments() {
     });
   };
 
-  const getClientName = (clientId) => {
-    const client = clients.find((c) => c.id === clientId);
-    return client ? client.name : 'N/A';
-  };
+  const getClientName = useCallback(
+    (clientId) => {
+      const client = clients.find((c) => c.id === clientId);
+      return client ? client.name : 'N/A';
+    },
+    [clients]
+  );
 
-  const getVehicleInfo = (vehicleId) => {
-    const vehicle = vehicles.find((v) => v.id === vehicleId);
-    return vehicle ? `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}` : 'N/A';
-  };
+  const getVehicleInfo = useCallback(
+    (vehicleId) => {
+      const vehicle = vehicles.find((v) => v.id === vehicleId);
+      return vehicle ? `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}` : 'N/A';
+    },
+    [vehicles]
+  );
 
-  const getClientVehicles = (clientId) => {
-    return vehicles.filter((v) => v.client_id === clientId);
-  };
+  const getClientVehicles = useCallback(
+    (clientId) => {
+      return vehicles.filter((v) => v.client_id === clientId);
+    },
+    [vehicles]
+  );
 
   const getStatusBadge = (status) => {
     const badges = {
