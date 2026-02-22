@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { Plus, Edit, Trash2, Package, Search } from 'lucide-react';
@@ -16,16 +17,31 @@ export default function Parts() {
   const [editingPart, setEditingPart] = useState(null);
   const [formData, setFormData] = useState({ name: '', description: '', supplier: '', price: '', stock: '0' });
   const [searchTerm, setSearchTerm] = useState('');
+  const [supplierCategoryFilter, setSupplierCategoryFilter] = useState('all');
+
+  const supplierCategories = useMemo(() => {
+    const values = parts
+      .map((part) => (part.supplier || '').trim())
+      .filter(Boolean);
+    return [...new Set(values)].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  }, [parts]);
 
   const filteredParts = useMemo(() => {
-    if (!searchTerm.trim()) return parts;
-    const term = searchTerm.toLowerCase();
-    return parts.filter((part) =>
-      part.name.toLowerCase().includes(term) ||
-      (part.description && part.description.toLowerCase().includes(term)) ||
-      (part.supplier && part.supplier.toLowerCase().includes(term))
-    );
-  }, [parts, searchTerm]);
+    const term = searchTerm.trim().toLowerCase();
+    return parts.filter((part) => {
+      const supplier = (part.supplier || '').trim();
+      const matchesSearch = !term || (
+        part.name.toLowerCase().includes(term) ||
+        (part.description && part.description.toLowerCase().includes(term)) ||
+        supplier.toLowerCase().includes(term)
+      );
+
+      if (!matchesSearch) return false;
+      if (supplierCategoryFilter === 'all') return true;
+      if (supplierCategoryFilter === '__none__') return !supplier;
+      return supplier === supplierCategoryFilter;
+    });
+  }, [parts, searchTerm, supplierCategoryFilter]);
 
   useEffect(() => {
     loadParts();
@@ -132,6 +148,20 @@ export default function Parts() {
               data-testid="parts-search-input"
             />
           </div>
+        </div>
+        <div className="mb-6">
+          <Select value={supplierCategoryFilter} onValueChange={setSupplierCategoryFilter}>
+            <SelectTrigger className="bg-zinc-950 border-zinc-800 rounded-sm max-w-sm" data-testid="parts-supplier-category-filter">
+              <SelectValue placeholder="Categoria de revendedora" />
+            </SelectTrigger>
+            <SelectContent className="bg-zinc-950 border-zinc-800">
+              <SelectItem value="all">Todas as revendedoras</SelectItem>
+              <SelectItem value="__none__">Sem revendedora</SelectItem>
+              {supplierCategories.map((supplier) => (
+                <SelectItem key={supplier} value={supplier}>{supplier}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

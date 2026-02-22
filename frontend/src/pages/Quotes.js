@@ -66,12 +66,27 @@ export default function Quotes() {
     }
   };
 
-  const supplierOptions = useMemo(() => {
-    const values = [...services, ...parts]
-      .map((item) => (item.supplier || '').trim())
+  const serviceSupplierOptions = useMemo(() => {
+    const values = services
+      .map((service) => (service.supplier || '').trim())
       .filter(Boolean);
     return [...new Set(values)].sort((a, b) => a.localeCompare(b, 'pt-BR'));
-  }, [services, parts]);
+  }, [services]);
+
+  const partSupplierOptions = useMemo(() => {
+    const values = parts
+      .map((part) => (part.supplier || '').trim())
+      .filter(Boolean);
+    return [...new Set(values)].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  }, [parts]);
+
+  const filteredPartOptions = useMemo(() => {
+    const selectedSupplier = (newItem.supplier || '').trim();
+    if (!selectedSupplier) return parts;
+    return parts.filter((part) => (part.supplier || '').trim() === selectedSupplier);
+  }, [parts, newItem.supplier]);
+
+  const itemOptions = newItem.type === 'service' ? services : filteredPartOptions;
 
   const filteredQuotes = useMemo(() => {
     const base = quoteClientFilter === 'all'
@@ -114,7 +129,12 @@ export default function Quotes() {
       items: [...prev.items, quoteItem],
     }));
 
-    setNewItem({ ...newItem, item_id: '', supplier: '', quantity: 1 });
+    setNewItem((prev) => ({
+      ...prev,
+      item_id: '',
+      supplier: prev.type === 'part' ? prev.supplier : '',
+      quantity: 1,
+    }));
   };
 
   const removeItemFromQuote = (index) => {
@@ -597,12 +617,14 @@ export default function Quotes() {
                       <Select
                         value={newItem.item_id}
                         onValueChange={(value) => {
-                          const source = newItem.type === 'service' ? services : parts;
+                          const source = newItem.type === 'service' ? services : filteredPartOptions;
                           const selected = source.find((item) => item.id === value);
                           setNewItem({
                             ...newItem,
                             item_id: value,
-                            supplier: selected?.supplier || '',
+                            supplier: newItem.type === 'part'
+                              ? (newItem.supplier || selected?.supplier || '')
+                              : (selected?.supplier || ''),
                           });
                         }}
                       >
@@ -610,7 +632,7 @@ export default function Quotes() {
                           <SelectValue placeholder="Selecione" />
                         </SelectTrigger>
                         <SelectContent className="bg-zinc-950 border-zinc-800">
-                          {(newItem.type === 'service' ? services : parts).map((item) => (
+                          {itemOptions.map((item) => (
                             <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>
                           ))}
                         </SelectContent>
@@ -618,17 +640,34 @@ export default function Quotes() {
                     </div>
                     <div className="col-span-3">
                       <Select
-                        value={newItem.supplier || '__none__'}
-                        onValueChange={(value) => setNewItem({ ...newItem, supplier: value === '__none__' ? '' : value })}
+                        value={newItem.type === 'part' ? (newItem.supplier || '__all__') : (newItem.supplier || '__none__')}
+                        onValueChange={(value) => {
+                          if (newItem.type === 'part') {
+                            setNewItem({ ...newItem, supplier: value === '__all__' ? '' : value, item_id: '' });
+                            return;
+                          }
+                          setNewItem({ ...newItem, supplier: value === '__none__' ? '' : value });
+                        }}
                       >
                         <SelectTrigger className="bg-zinc-950 border-zinc-800 rounded-sm" data-testid="item-supplier-select">
                           <SelectValue placeholder="Revendedora" />
                         </SelectTrigger>
                         <SelectContent className="bg-zinc-950 border-zinc-800">
-                          <SelectItem value="__none__">Sem revendedora</SelectItem>
-                          {supplierOptions.map((supplier) => (
-                            <SelectItem key={supplier} value={supplier}>{supplier}</SelectItem>
-                          ))}
+                          {newItem.type === 'part' ? (
+                            <>
+                              <SelectItem value="__all__">Todas as revendedoras</SelectItem>
+                              {partSupplierOptions.map((supplier) => (
+                                <SelectItem key={supplier} value={supplier}>{supplier}</SelectItem>
+                              ))}
+                            </>
+                          ) : (
+                            <>
+                              <SelectItem value="__none__">Sem revendedora</SelectItem>
+                              {serviceSupplierOptions.map((supplier) => (
+                                <SelectItem key={supplier} value={supplier}>{supplier}</SelectItem>
+                              ))}
+                            </>
+                          )}
                         </SelectContent>
                       </Select>
                     </div>
@@ -654,6 +693,11 @@ export default function Quotes() {
                       </Button>
                     </div>
                   </div>
+                  {newItem.type === 'part' && newItem.supplier && itemOptions.length === 0 && (
+                    <p className="text-xs text-yellow-400 mt-2">
+                      Nenhuma peca cadastrada para a revendedora selecionada.
+                    </p>
+                  )}
                 </div>
 
                 {formData.items.length > 0 && (
