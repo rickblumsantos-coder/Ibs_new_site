@@ -67,16 +67,16 @@ export default function Vehicles() {
       };
       if (editingVehicle) {
         await api.updateVehicle(editingVehicle.id, data);
-        toast.success('VeÃ­culo atualizado com sucesso!');
+        toast.success('Veículo atualizado com sucesso!');
       } else {
         await api.createVehicle(data);
-        toast.success('VeÃ­culo criado com sucesso!');
+        toast.success('Veículo criado com sucesso!');
       }
       setDialogOpen(false);
       resetForm();
       loadData();
     } catch (error) {
-      toast.error('Erro ao salvar veÃ­culo');
+      toast.error('Erro ao salvar veículo');
     }
   };
 
@@ -99,13 +99,13 @@ export default function Vehicles() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir este veÃ­culo?')) {
+    if (window.confirm('Tem certeza que deseja excluir este veículo?')) {
       try {
         await api.deleteVehicle(id);
-        toast.success('VeÃ­culo excluÃ­do com sucesso!');
+        toast.success('Veículo excluído com sucesso!');
         loadData();
       } catch (error) {
-        toast.error('Erro ao excluir veÃ­culo');
+        toast.error('Erro ao excluir veículo');
       }
     }
   };
@@ -142,7 +142,7 @@ export default function Vehicles() {
     );
   }, [vehicles, searchTerm, clients]);
 
-  // Agrupar veÃ­culos por marca
+  // Agrupar veículos por marca
   const vehiclesByBrand = useMemo(() => {
     const grouped = {};
     filteredVehicles.forEach((vehicle) => {
@@ -168,7 +168,7 @@ export default function Vehicles() {
     }));
   };
 
-  // Expandir todas as marcas por padrÃ£o
+  // Expandir todas as marcas por padrão
   useEffect(() => {
     setExpandedBrands((prev) => {
       const next = {};
@@ -185,9 +185,9 @@ export default function Vehicles() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div>
             <h1 className="text-4xl font-heading font-bold uppercase tracking-tight text-zinc-50">
-              VEÃCULOS
+              VEÍCULOS
             </h1>
-            <p className="text-zinc-400 text-sm mt-1">Gerencie os veÃ­culos dos clientes</p>
+            <p className="text-zinc-400 text-sm mt-1">Gerencie os veículos dos clientes</p>
           </div>
           <Button
             onClick={() => {
@@ -198,7 +198,7 @@ export default function Vehicles() {
             data-testid="add-vehicle-button"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Novo VeÃ­culo
+            Novo Veículo
           </Button>
         </div>
 
@@ -220,7 +220,7 @@ export default function Vehicles() {
           {loading ? (
             <div className="text-center py-12 text-zinc-500">Carregando...</div>
           ) : filteredVehicles.length === 0 ? (
-            <div className="text-center py-12 text-zinc-500">Nenhum veÃ­culo encontrado</div>
+            <div className="text-center py-12 text-zinc-500">Nenhum veículo encontrado</div>
           ) : (
             Object.entries(vehiclesByBrand).map(([brand, brandVehicles]) => (
               <div key={brand} className="bg-zinc-900 border border-zinc-800 rounded-sm overflow-hidden">
@@ -234,7 +234,7 @@ export default function Vehicles() {
                     <Car className="w-5 h-5 text-red-500" />
                     <span className="text-lg font-heading font-bold uppercase text-zinc-50">{brand}</span>
                     <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-sm">
-                      {brandVehicles.length} {brandVehicles.length === 1 ? 'veÃ­culo' : 'veÃ­culos'}
+                      {brandVehicles.length} {brandVehicles.length === 1 ? 'veículo' : 'veículos'}
                     </span>
                   </div>
                   {expandedBrands[brand] ? (
@@ -244,7 +244,7 @@ export default function Vehicles() {
                   )}
                 </button>
                 
-                {/* Lista de veÃ­culos da marca */}
+                {/* Lista de veículos da marca */}
                 {expandedBrands[brand] && (
                   <div className="divide-y divide-zinc-800">
                     {brandVehicles.map((vehicle) => (
@@ -269,9 +269,9 @@ export default function Vehicles() {
                               <div className="text-xs text-zinc-500 uppercase mb-1">Cliente</div>
                               <div className="text-sm text-zinc-200">{getClientName(vehicle.client_id)}</div>
                             </div>
-                            {/* EspecificaÃ§Ãµes */}
+                            {/* Especificações */}
                             <div>
-                              <div className="text-xs text-zinc-500 uppercase mb-1">EspecificaÃ§Ãµes</div>
+                              <div className="text-xs text-zinc-500 uppercase mb-1">Especificações</div>
                               <div className="flex flex-wrap gap-1">
                                 {vehicle.color && (
                                   <span className="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-sm">{vehicle.color}</span>
@@ -291,7 +291,7 @@ export default function Vehicles() {
                               </div>
                             </div>
                           </div>
-                          {/* AÃ§Ãµes */}
+                          {/* Ações */}
                           <div className="flex items-center gap-2">
                             <Button
                               onClick={() => handleEdit(vehicle)}
@@ -326,7 +326,7 @@ export default function Vehicles() {
           <DialogContent className="bg-zinc-950 border-zinc-800 text-zinc-50 max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="vehicle-dialog">
             <DialogHeader>
               <DialogTitle className="text-xl font-heading font-bold uppercase">
-                {editingVehicle ? 'EDITAR VEÃCULO' : 'NOVO VEÃCULO'}
+                {editingVehicle ? 'EDITAR VEÍCULO' : 'NOVO VEÍCULO'}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
@@ -354,7 +354,7 @@ export default function Vehicles() {
                 </div>
                 
                 <div className="border-t border-zinc-800 pt-4">
-                  <h3 className="text-sm font-semibold uppercase text-zinc-400 mb-3">InformaÃ§Ãµes BÃ¡sicas</h3>
+                  <h3 className="text-sm font-semibold uppercase text-zinc-400 mb-3">Informações Básicas</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="license_plate" className="text-xs font-semibold uppercase text-zinc-500">
@@ -418,7 +418,7 @@ export default function Vehicles() {
                 </div>
 
                 <div className="border-t border-zinc-800 pt-4">
-                  <h3 className="text-sm font-semibold uppercase text-zinc-400 mb-3">EspecificaÃ§Ãµes</h3>
+                  <h3 className="text-sm font-semibold uppercase text-zinc-400 mb-3">Especificações</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="color" className="text-xs font-semibold uppercase text-zinc-500">
@@ -450,18 +450,18 @@ export default function Vehicles() {
                   <div className="grid grid-cols-2 gap-4 mt-4">
                     <div className="space-y-2">
                       <Label htmlFor="transmission" className="text-xs font-semibold uppercase text-zinc-500">
-                        CÃ¢mbio
+                        Câmbio
                       </Label>
                       <Select
                         value={formData.transmission}
                         onValueChange={(value) => setFormData({ ...formData, transmission: value })}
                       >
                         <SelectTrigger className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm" data-testid="vehicle-transmission-select">
-                          <SelectValue placeholder="Selecione o cÃ¢mbio" />
+                          <SelectValue placeholder="Selecione o câmbio" />
                         </SelectTrigger>
                         <SelectContent className="bg-zinc-950 border-zinc-800">
                           <SelectItem value="Manual">Manual</SelectItem>
-                          <SelectItem value="AutomÃ¡tico">AutomÃ¡tico</SelectItem>
+                          <SelectItem value="Automático">Automático</SelectItem>
                           <SelectItem value="CVT">CVT</SelectItem>
                           <SelectItem value="Automatizado">Automatizado</SelectItem>
                         </SelectContent>
@@ -469,22 +469,22 @@ export default function Vehicles() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="fuel_type" className="text-xs font-semibold uppercase text-zinc-500">
-                        CombustÃ­vel
+                        Combustível
                       </Label>
                       <Select
                         value={formData.fuel_type}
                         onValueChange={(value) => setFormData({ ...formData, fuel_type: value })}
                       >
                         <SelectTrigger className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm" data-testid="vehicle-fuel-select">
-                          <SelectValue placeholder="Selecione o combustÃ­vel" />
+                          <SelectValue placeholder="Selecione o combustível" />
                         </SelectTrigger>
                         <SelectContent className="bg-zinc-950 border-zinc-800">
                           <SelectItem value="Gasolina">Gasolina</SelectItem>
                           <SelectItem value="Etanol">Etanol</SelectItem>
                           <SelectItem value="Flex">Flex</SelectItem>
                           <SelectItem value="Diesel">Diesel</SelectItem>
-                          <SelectItem value="ElÃ©trico">ElÃ©trico</SelectItem>
-                          <SelectItem value="HÃ­brido">HÃ­brido</SelectItem>
+                          <SelectItem value="Elétrico">Elétrico</SelectItem>
+                          <SelectItem value="Híbrido">Híbrido</SelectItem>
                           <SelectItem value="GNV">GNV</SelectItem>
                         </SelectContent>
                       </Select>
@@ -511,13 +511,13 @@ export default function Vehicles() {
                 <div className="border-t border-zinc-800 pt-4">
                   <div className="space-y-2">
                     <Label htmlFor="notes" className="text-xs font-semibold uppercase text-zinc-500">
-                      ObservaÃ§Ãµes
+                      Observações
                     </Label>
                     <Textarea
                       id="notes"
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                      placeholder="InformaÃ§Ãµes adicionais sobre o veÃ­culo..."
+                      placeholder="Informações adicionais sobre o veículo..."
                       className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
                       rows={2}
                       data-testid="vehicle-notes-input"

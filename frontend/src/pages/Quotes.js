@@ -93,7 +93,7 @@ export default function Quotes() {
     if (!itemData) return;
     const quantity = parseInt(newItem.quantity, 10);
     if (!quantity || quantity <= 0) {
-      toast.error('Quantidade invÃ¡lida');
+      toast.error('Quantidade inválida');
       return;
     }
 
@@ -244,7 +244,7 @@ export default function Quotes() {
     return vehicle ? `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}` : 'N/A';
   };
 
-  // Filtrar veÃ­culos pela busca (marca, modelo ou placa)
+  // Filtrar veículos pela busca (marca, modelo ou placa)
   const filteredVehiclesForSearch = useMemo(() => {
     if (!vehicleSearch.trim()) return vehicles;
     const term = vehicleSearch.toLowerCase();
@@ -256,7 +256,7 @@ export default function Quotes() {
     );
   }, [vehicles, vehicleSearch, getClientName]);
 
-  // Agrupar veÃ­culos filtrados por marca
+  // Agrupar veículos filtrados por marca
   const groupedVehicles = useMemo(() => {
     const grouped = {};
     filteredVehiclesForSearch.forEach((vehicle) => {
@@ -308,7 +308,7 @@ export default function Quotes() {
       pending: 'Pendente',
       approved: 'Aprovado',
       rejected: 'Rejeitado',
-      completed: 'ConcluÃ­do',
+      completed: 'Concluído',
     };
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-sm text-xs font-medium border ${badges[status]}`}>
@@ -323,9 +323,9 @@ export default function Quotes() {
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-8 gap-4">
           <div>
             <h1 className="text-4xl font-heading font-bold uppercase tracking-tight text-zinc-50">
-              ORÃ‡AMENTOS
+              ORÇAMENTOS
             </h1>
-            <p className="text-zinc-400 text-sm mt-1">Gerencie os orÃ§amentos da oficina</p>
+            <p className="text-zinc-400 text-sm mt-1">Gerencie os orçamentos da oficina</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
             <div className="min-w-[240px]">
@@ -347,7 +347,7 @@ export default function Quotes() {
               data-testid="add-quote-button"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Novo OrÃ§amento
+              Novo Orçamento
             </Button>
           </div>
         </div>
@@ -356,7 +356,7 @@ export default function Quotes() {
           {loading ? (
             <div className="col-span-full text-center py-12 text-zinc-500">Carregando...</div>
           ) : filteredQuotes.length === 0 ? (
-            <div className="col-span-full text-center py-12 text-zinc-500">Nenhum orÃ§amento encontrado</div>
+            <div className="col-span-full text-center py-12 text-zinc-500">Nenhum orçamento encontrado</div>
           ) : (
             filteredQuotes.map((quote) => (
               <div
@@ -367,7 +367,7 @@ export default function Quotes() {
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <h3 className="text-lg font-heading font-bold uppercase text-zinc-50 mb-1">
-                      ORÃ‡AMENTO #{quote.id.substring(0, 8)}
+                      ORÇAMENTO #{quote.id.substring(0, 8)}
                     </h3>
                     <p className="text-xs text-zinc-500 font-mono">
                       {format(new Date(quote.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
@@ -382,7 +382,7 @@ export default function Quotes() {
                     <span className="text-zinc-200 font-medium">{getClientName(quote.client_id)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-zinc-500">VeÃ­culo:</span>
+                    <span className="text-zinc-500">Veículo:</span>
                     <span className="text-zinc-200 font-mono text-xs">{getVehicleInfo(quote.vehicle_id)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
@@ -399,7 +399,7 @@ export default function Quotes() {
                   )}
                   {quote.labor_cost > 0 && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-zinc-500">MÃ£o de Obra:</span>
+                      <span className="text-zinc-500">Mão de Obra:</span>
                       <span className="text-green-400 font-mono">R$ {quote.labor_cost.toFixed(2)}</span>
                     </div>
                   )}
@@ -467,14 +467,14 @@ export default function Quotes() {
           <DialogContent className="bg-zinc-950 border-zinc-800 text-zinc-50 max-w-3xl max-h-[90vh] overflow-y-auto" data-testid="quote-dialog">
             <DialogHeader>
               <DialogTitle className="text-xl font-heading font-bold uppercase">
-                {editingQuote ? 'EDITAR ORÃ‡AMENTO' : 'NOVO ORÃ‡AMENTO'}
+                {editingQuote ? 'EDITAR ORÇAMENTO' : 'NOVO ORÇAMENTO'}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
               <div className="space-y-6 py-4">
                 {editingQuote && (
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase text-zinc-500">Status do OrÃ§amento</Label>
+                    <Label className="text-xs font-semibold uppercase text-zinc-500">Status do Orçamento</Label>
                     <Select
                       value={formData.status}
                       onValueChange={(value) => setFormData({ ...formData, status: value })}
@@ -486,16 +486,16 @@ export default function Quotes() {
                         <SelectItem value="pending">Pendente</SelectItem>
                         <SelectItem value="approved">Aprovado</SelectItem>
                         <SelectItem value="rejected">Rejeitado</SelectItem>
-                        <SelectItem value="completed">ConcluÃ­do</SelectItem>
+                        <SelectItem value="completed">Concluído</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 )}
-                {/* Busca de VeÃ­culo com Autocomplete */}
+                {/* Busca de Veículo com Autocomplete */}
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold uppercase text-zinc-500">
                     <Car className="w-3 h-3 inline mr-1" />
-                    Buscar VeÃ­culo *
+                    Buscar Veículo *
                   </Label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
@@ -518,7 +518,7 @@ export default function Quotes() {
                     {showVehicleDropdown && vehicleSearch && (
                       <div className="absolute z-50 w-full mt-1 bg-zinc-950 border border-zinc-800 rounded-sm max-h-64 overflow-y-auto shadow-lg">
                         {Object.keys(groupedVehicles).length === 0 ? (
-                          <div className="p-3 text-sm text-zinc-500 text-center">Nenhum veÃ­culo encontrado</div>
+                          <div className="p-3 text-sm text-zinc-500 text-center">Nenhum veículo encontrado</div>
                         ) : (
                           Object.entries(groupedVehicles).map(([brand, brandVehicles]) => (
                             <div key={brand}>
@@ -544,7 +544,7 @@ export default function Quotes() {
                                 >
                                   <div>
                                     <div className="text-sm text-zinc-200">{vehicle.model}</div>
-                                    <div className="text-xs text-zinc-500">{vehicle.license_plate} â€¢ {getClientName(vehicle.client_id)}</div>
+                                    <div className="text-xs text-zinc-500">{vehicle.license_plate} - {getClientName(vehicle.client_id)}</div>
                                   </div>
                                   <span className="text-xs text-zinc-600 font-mono">{vehicle.year}</span>
                                 </button>
@@ -559,7 +559,7 @@ export default function Quotes() {
                     <div className="flex items-center gap-2 mt-2 p-2 bg-zinc-900/50 border border-zinc-800 rounded-sm">
                       <Car className="w-4 h-4 text-red-500" />
                       <span className="text-sm text-zinc-300">{getVehicleInfo(formData.vehicle_id)}</span>
-                      <span className="text-xs text-zinc-500">â€¢ Cliente: {getClientName(formData.client_id)}</span>
+                      <span className="text-xs text-zinc-500">- Cliente: {getClientName(formData.client_id)}</span>
                       <Button
                         type="button"
                         variant="ghost"
@@ -588,8 +588,8 @@ export default function Quotes() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-zinc-950 border-zinc-800">
-                          <SelectItem value="service">ServiÃ§o</SelectItem>
-                          <SelectItem value="part">PeÃ§a</SelectItem>
+                          <SelectItem value="service">Serviço</SelectItem>
+                          <SelectItem value="part">Peça</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -699,7 +699,7 @@ export default function Quotes() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase text-zinc-500">MÃ£o de Obra (R$)</Label>
+                    <Label className="text-xs font-semibold uppercase text-zinc-500">Mão de Obra (R$)</Label>
                     <Input
                       type="number"
                       step="0.01"
@@ -729,7 +729,7 @@ export default function Quotes() {
                     </div>
                     {parseFloat(formData.labor_cost) > 0 && (
                       <div className="flex justify-between items-center text-sm">
-                        <span className="text-zinc-500">MÃ£o de Obra:</span>
+                        <span className="text-zinc-500">Mão de Obra:</span>
                         <span className="font-mono text-green-400">+ R$ {parseFloat(formData.labor_cost || 0).toFixed(2)}</span>
                       </div>
                     )}
@@ -749,7 +749,7 @@ export default function Quotes() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs font-semibold uppercase text-zinc-500">ObservaÃ§Ãµes</Label>
+                  <Label className="text-xs font-semibold uppercase text-zinc-500">Observações</Label>
                   <Textarea
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -775,7 +775,7 @@ export default function Quotes() {
                   className="bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded-sm active:scale-95"
                   data-testid="save-quote-button"
                 >
-                  {editingQuote ? 'ATUALIZAR' : 'CRIAR ORÃ‡AMENTO'}
+                  {editingQuote ? 'ATUALIZAR' : 'CRIAR ORÇAMENTO'}
                 </Button>
               </DialogFooter>
             </form>
