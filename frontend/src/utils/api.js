@@ -38,6 +38,7 @@ export const api = {
   getQuotes: () => axios.get(`${API_URL}/quotes`),
   createQuote: (data) => axios.post(`${API_URL}/quotes`, data),
   updateQuote: (id, data) => axios.put(`${API_URL}/quotes/${id}`, data),
+  updateQuoteStatus: (id, status) => axios.patch(`${API_URL}/quotes/${id}/status`, { status }),
   deleteQuote: (id) => axios.delete(`${API_URL}/quotes/${id}`),
   approveQuote: (id) => axios.post(`${API_URL}/quotes/${id}/approve`),
   rejectQuote: (id) => axios.post(`${API_URL}/quotes/${id}/reject`),

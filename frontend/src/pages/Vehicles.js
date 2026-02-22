@@ -67,16 +67,16 @@ export default function Vehicles() {
       };
       if (editingVehicle) {
         await api.updateVehicle(editingVehicle.id, data);
-        toast.success('Veículo atualizado com sucesso!');
+        toast.success('VeÃ­culo atualizado com sucesso!');
       } else {
         await api.createVehicle(data);
-        toast.success('Veículo criado com sucesso!');
+        toast.success('VeÃ­culo criado com sucesso!');
       }
       setDialogOpen(false);
       resetForm();
       loadData();
     } catch (error) {
-      toast.error('Erro ao salvar veículo');
+      toast.error('Erro ao salvar veÃ­culo');
     }
   };
 
@@ -99,13 +99,13 @@ export default function Vehicles() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir este veículo?')) {
+    if (window.confirm('Tem certeza que deseja excluir este veÃ­culo?')) {
       try {
         await api.deleteVehicle(id);
-        toast.success('Veículo excluído com sucesso!');
+        toast.success('VeÃ­culo excluÃ­do com sucesso!');
         loadData();
       } catch (error) {
-        toast.error('Erro ao excluir veículo');
+        toast.error('Erro ao excluir veÃ­culo');
       }
     }
   };
@@ -132,14 +132,17 @@ export default function Vehicles() {
     return client ? client.name : 'N/A';
   };
 
-  const filteredVehicles = vehicles.filter((vehicle) =>
-    vehicle.license_plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    getClientName(vehicle.client_id).toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredVehicles = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    return vehicles.filter((vehicle) =>
+      vehicle.license_plate.toLowerCase().includes(term) ||
+      vehicle.model.toLowerCase().includes(term) ||
+      vehicle.brand.toLowerCase().includes(term) ||
+      getClientName(vehicle.client_id).toLowerCase().includes(term)
+    );
+  }, [vehicles, searchTerm, clients]);
 
-  // Agrupar veículos por marca
+  // Agrupar veÃ­culos por marca
   const vehiclesByBrand = useMemo(() => {
     const grouped = {};
     filteredVehicles.forEach((vehicle) => {
@@ -165,13 +168,15 @@ export default function Vehicles() {
     }));
   };
 
-  // Expandir todas as marcas por padrão
+  // Expandir todas as marcas por padrÃ£o
   useEffect(() => {
-    const allBrands = {};
-    Object.keys(vehiclesByBrand).forEach((brand) => {
-      allBrands[brand] = true;
+    setExpandedBrands((prev) => {
+      const next = {};
+      Object.keys(vehiclesByBrand).forEach((brand) => {
+        next[brand] = prev[brand] ?? true;
+      });
+      return next;
     });
-    setExpandedBrands(allBrands);
   }, [vehiclesByBrand]);
 
   return (
@@ -180,9 +185,9 @@ export default function Vehicles() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div>
             <h1 className="text-4xl font-heading font-bold uppercase tracking-tight text-zinc-50">
-              VEÍCULOS
+              VEÃCULOS
             </h1>
-            <p className="text-zinc-400 text-sm mt-1">Gerencie os veículos dos clientes</p>
+            <p className="text-zinc-400 text-sm mt-1">Gerencie os veÃ­culos dos clientes</p>
           </div>
           <Button
             onClick={() => {
@@ -193,7 +198,7 @@ export default function Vehicles() {
             data-testid="add-vehicle-button"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Novo Veículo
+            Novo VeÃ­culo
           </Button>
         </div>
 
@@ -215,7 +220,7 @@ export default function Vehicles() {
           {loading ? (
             <div className="text-center py-12 text-zinc-500">Carregando...</div>
           ) : filteredVehicles.length === 0 ? (
-            <div className="text-center py-12 text-zinc-500">Nenhum veículo encontrado</div>
+            <div className="text-center py-12 text-zinc-500">Nenhum veÃ­culo encontrado</div>
           ) : (
             Object.entries(vehiclesByBrand).map(([brand, brandVehicles]) => (
               <div key={brand} className="bg-zinc-900 border border-zinc-800 rounded-sm overflow-hidden">
@@ -229,7 +234,7 @@ export default function Vehicles() {
                     <Car className="w-5 h-5 text-red-500" />
                     <span className="text-lg font-heading font-bold uppercase text-zinc-50">{brand}</span>
                     <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-sm">
-                      {brandVehicles.length} {brandVehicles.length === 1 ? 'veículo' : 'veículos'}
+                      {brandVehicles.length} {brandVehicles.length === 1 ? 'veÃ­culo' : 'veÃ­culos'}
                     </span>
                   </div>
                   {expandedBrands[brand] ? (
@@ -239,7 +244,7 @@ export default function Vehicles() {
                   )}
                 </button>
                 
-                {/* Lista de veículos da marca */}
+                {/* Lista de veÃ­culos da marca */}
                 {expandedBrands[brand] && (
                   <div className="divide-y divide-zinc-800">
                     {brandVehicles.map((vehicle) => (
@@ -264,9 +269,9 @@ export default function Vehicles() {
                               <div className="text-xs text-zinc-500 uppercase mb-1">Cliente</div>
                               <div className="text-sm text-zinc-200">{getClientName(vehicle.client_id)}</div>
                             </div>
-                            {/* Especificações */}
+                            {/* EspecificaÃ§Ãµes */}
                             <div>
-                              <div className="text-xs text-zinc-500 uppercase mb-1">Especificações</div>
+                              <div className="text-xs text-zinc-500 uppercase mb-1">EspecificaÃ§Ãµes</div>
                               <div className="flex flex-wrap gap-1">
                                 {vehicle.color && (
                                   <span className="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-sm">{vehicle.color}</span>
@@ -286,7 +291,7 @@ export default function Vehicles() {
                               </div>
                             </div>
                           </div>
-                          {/* Ações */}
+                          {/* AÃ§Ãµes */}
                           <div className="flex items-center gap-2">
                             <Button
                               onClick={() => handleEdit(vehicle)}
@@ -321,7 +326,7 @@ export default function Vehicles() {
           <DialogContent className="bg-zinc-950 border-zinc-800 text-zinc-50 max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="vehicle-dialog">
             <DialogHeader>
               <DialogTitle className="text-xl font-heading font-bold uppercase">
-                {editingVehicle ? 'EDITAR VEÍCULO' : 'NOVO VEÍCULO'}
+                {editingVehicle ? 'EDITAR VEÃCULO' : 'NOVO VEÃCULO'}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
@@ -349,7 +354,7 @@ export default function Vehicles() {
                 </div>
                 
                 <div className="border-t border-zinc-800 pt-4">
-                  <h3 className="text-sm font-semibold uppercase text-zinc-400 mb-3">Informações Básicas</h3>
+                  <h3 className="text-sm font-semibold uppercase text-zinc-400 mb-3">InformaÃ§Ãµes BÃ¡sicas</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="license_plate" className="text-xs font-semibold uppercase text-zinc-500">
@@ -413,7 +418,7 @@ export default function Vehicles() {
                 </div>
 
                 <div className="border-t border-zinc-800 pt-4">
-                  <h3 className="text-sm font-semibold uppercase text-zinc-400 mb-3">Especificações</h3>
+                  <h3 className="text-sm font-semibold uppercase text-zinc-400 mb-3">EspecificaÃ§Ãµes</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="color" className="text-xs font-semibold uppercase text-zinc-500">
@@ -445,18 +450,18 @@ export default function Vehicles() {
                   <div className="grid grid-cols-2 gap-4 mt-4">
                     <div className="space-y-2">
                       <Label htmlFor="transmission" className="text-xs font-semibold uppercase text-zinc-500">
-                        Câmbio
+                        CÃ¢mbio
                       </Label>
                       <Select
                         value={formData.transmission}
                         onValueChange={(value) => setFormData({ ...formData, transmission: value })}
                       >
                         <SelectTrigger className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm" data-testid="vehicle-transmission-select">
-                          <SelectValue placeholder="Selecione o câmbio" />
+                          <SelectValue placeholder="Selecione o cÃ¢mbio" />
                         </SelectTrigger>
                         <SelectContent className="bg-zinc-950 border-zinc-800">
                           <SelectItem value="Manual">Manual</SelectItem>
-                          <SelectItem value="Automático">Automático</SelectItem>
+                          <SelectItem value="AutomÃ¡tico">AutomÃ¡tico</SelectItem>
                           <SelectItem value="CVT">CVT</SelectItem>
                           <SelectItem value="Automatizado">Automatizado</SelectItem>
                         </SelectContent>
@@ -464,22 +469,22 @@ export default function Vehicles() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="fuel_type" className="text-xs font-semibold uppercase text-zinc-500">
-                        Combustível
+                        CombustÃ­vel
                       </Label>
                       <Select
                         value={formData.fuel_type}
                         onValueChange={(value) => setFormData({ ...formData, fuel_type: value })}
                       >
                         <SelectTrigger className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm" data-testid="vehicle-fuel-select">
-                          <SelectValue placeholder="Selecione o combustível" />
+                          <SelectValue placeholder="Selecione o combustÃ­vel" />
                         </SelectTrigger>
                         <SelectContent className="bg-zinc-950 border-zinc-800">
                           <SelectItem value="Gasolina">Gasolina</SelectItem>
                           <SelectItem value="Etanol">Etanol</SelectItem>
                           <SelectItem value="Flex">Flex</SelectItem>
                           <SelectItem value="Diesel">Diesel</SelectItem>
-                          <SelectItem value="Elétrico">Elétrico</SelectItem>
-                          <SelectItem value="Híbrido">Híbrido</SelectItem>
+                          <SelectItem value="ElÃ©trico">ElÃ©trico</SelectItem>
+                          <SelectItem value="HÃ­brido">HÃ­brido</SelectItem>
                           <SelectItem value="GNV">GNV</SelectItem>
                         </SelectContent>
                       </Select>
@@ -506,13 +511,13 @@ export default function Vehicles() {
                 <div className="border-t border-zinc-800 pt-4">
                   <div className="space-y-2">
                     <Label htmlFor="notes" className="text-xs font-semibold uppercase text-zinc-500">
-                      Observações
+                      ObservaÃ§Ãµes
                     </Label>
                     <Textarea
                       id="notes"
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                      placeholder="Informações adicionais sobre o veículo..."
+                      placeholder="InformaÃ§Ãµes adicionais sobre o veÃ­culo..."
                       className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
                       rows={2}
                       data-testid="vehicle-notes-input"

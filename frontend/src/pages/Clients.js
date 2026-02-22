@@ -12,7 +12,9 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, History } from 'lucide-react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 export default function Clients() {
   const [clients, setClients] = useState([]);
@@ -20,6 +22,10 @@ export default function Clients() {
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyClient, setHistoryClient] = useState(null);
+  const [historyData, setHistoryData] = useState({ quotes: [], appointments: [] });
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -82,6 +88,50 @@ export default function Clients() {
       } catch (error) {
         toast.error('Erro ao excluir cliente');
       }
+    }
+  };
+
+  const handleOpenHistory = async (client) => {
+    setHistoryClient(client);
+    setHistoryDialogOpen(true);
+    setHistoryLoading(true);
+    try {
+      const [quotesRes, appointmentsRes, vehiclesRes] = await Promise.all([
+        api.getQuotes(),
+        api.getAppointments(),
+        api.getVehicles(),
+      ]);
+
+      const vehiclesById = vehiclesRes.data.reduce((acc, vehicle) => {
+        acc[vehicle.id] = vehicle;
+        return acc;
+      }, {});
+
+      const quotes = quotesRes.data
+        .filter((quote) => quote.client_id === client.id)
+        .map((quote) => ({
+          ...quote,
+          vehicle_label: vehiclesById[quote.vehicle_id]
+            ? `${vehiclesById[quote.vehicle_id].brand} ${vehiclesById[quote.vehicle_id].model} - ${vehiclesById[quote.vehicle_id].license_plate}`
+            : 'N/A',
+        }))
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      const appointments = appointmentsRes.data
+        .filter((apt) => apt.client_id === client.id)
+        .map((apt) => ({
+          ...apt,
+          vehicle_label: vehiclesById[apt.vehicle_id]
+            ? `${vehiclesById[apt.vehicle_id].brand} ${vehiclesById[apt.vehicle_id].model} - ${vehiclesById[apt.vehicle_id].license_plate}`
+            : 'N/A',
+        }))
+        .sort((a, b) => new Date(b.appointment_date) - new Date(a.appointment_date));
+
+      setHistoryData({ quotes, appointments });
+    } catch (error) {
+      toast.error('Erro ao carregar histórico do cliente');
+    } finally {
+      setHistoryLoading(false);
     }
   };
 
@@ -165,6 +215,15 @@ export default function Clients() {
                       <td className="text-sm text-zinc-200 px-4 font-mono">{client.cpf || '-'}</td>
                       <td className="px-4">
                         <div className="flex items-center justify-end gap-2">
+                          <Button
+                            onClick={() => handleOpenHistory(client)}
+                            variant="ghost"
+                            size="sm"
+                            className="hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-sm"
+                            data-testid={`history-client-${client.id}`}
+                          >
+                            <History className="w-4 h-4" />
+                          </Button>
                           <Button
                             onClick={() => handleEdit(client)}
                             variant="ghost"
@@ -288,6 +347,87 @@ export default function Clients() {
                 </Button>
               </DialogFooter>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={historyDialogOpen} onOpenChange={setHistoryDialogOpen}>
+          <DialogContent className="bg-zinc-950 border-zinc-800 text-zinc-50 max-w-4xl max-h-[90vh] overflow-y-auto" data-testid="client-history-dialog">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-heading font-bold uppercase">
+                HISTÓRICO {historyClient ? `• ${historyClient.name}` : ''}
+              </DialogTitle>
+            </DialogHeader>
+
+            {historyLoading ? (
+              <div className="text-center py-10 text-zinc-500">Carregando histórico...</div>
+            ) : (
+              <div className="space-y-6 py-2">
+                <div className="border border-zinc-800 rounded-sm overflow-hidden">
+                  <div className="px-4 py-3 bg-zinc-900/60 border-b border-zinc-800">
+                    <h3 className="text-sm font-semibold uppercase text-zinc-300">
+                      Orçamentos ({historyData.quotes.length})
+                    </h3>
+                  </div>
+                  {historyData.quotes.length === 0 ? (
+                    <div className="p-4 text-sm text-zinc-500">Nenhum orçamento para este cliente.</div>
+                  ) : (
+                    <div className="divide-y divide-zinc-800">
+                      {historyData.quotes.map((quote) => (
+                        <div key={quote.id} className="p-4">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="text-sm text-zinc-200 font-medium">
+                              #{quote.id.substring(0, 8)} • {quote.vehicle_label}
+                            </div>
+                            <div className="text-xs text-zinc-500 font-mono">
+                              {format(new Date(quote.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                            </div>
+                          </div>
+                          <div className="text-xs text-zinc-400 uppercase">
+                            Status: {quote.status} • Total: R$ {quote.total.toFixed(2)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="border border-zinc-800 rounded-sm overflow-hidden">
+                  <div className="px-4 py-3 bg-zinc-900/60 border-b border-zinc-800">
+                    <h3 className="text-sm font-semibold uppercase text-zinc-300">
+                      Agendamentos ({historyData.appointments.length})
+                    </h3>
+                  </div>
+                  {historyData.appointments.length === 0 ? (
+                    <div className="p-4 text-sm text-zinc-500">Nenhum agendamento para este cliente.</div>
+                  ) : (
+                    <div className="divide-y divide-zinc-800">
+                      {historyData.appointments.map((apt) => (
+                        <div key={apt.id} className="p-4">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="text-sm text-zinc-200 font-medium">{apt.vehicle_label}</div>
+                            <div className="text-xs text-zinc-500 font-mono">
+                              {format(new Date(apt.appointment_date), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                            </div>
+                          </div>
+                          <div className="text-xs text-zinc-400 uppercase">Status: {apt.status}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setHistoryDialogOpen(false)}
+                className="border border-zinc-700 hover:border-zinc-500 text-white rounded-sm"
+              >
+                Fechar
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>

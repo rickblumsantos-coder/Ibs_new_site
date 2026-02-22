@@ -7,14 +7,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Search, Wrench } from 'lucide-react';
+import { Plus, Edit, Trash2, Search } from 'lucide-react';
 
 export default function Services() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingService, setEditingService] = useState(null);
-  const [formData, setFormData] = useState({ name: '', description: '', default_price: '' });
+  const [formData, setFormData] = useState({ name: '', description: '', supplier: '', default_price: '' });
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredServices = useMemo(() => {
@@ -22,7 +22,8 @@ export default function Services() {
     const term = searchTerm.toLowerCase();
     return services.filter((service) =>
       service.name.toLowerCase().includes(term) ||
-      (service.description && service.description.toLowerCase().includes(term))
+      (service.description && service.description.toLowerCase().includes(term)) ||
+      (service.supplier && service.supplier.toLowerCase().includes(term))
     );
   }, [services, searchTerm]);
 
@@ -65,6 +66,7 @@ export default function Services() {
     setFormData({
       name: service.name,
       description: service.description || '',
+      supplier: service.supplier || '',
       default_price: service.default_price,
     });
     setDialogOpen(true);
@@ -84,7 +86,7 @@ export default function Services() {
 
   const resetForm = () => {
     setEditingService(null);
-    setFormData({ name: '', description: '', default_price: '' });
+    setFormData({ name: '', description: '', supplier: '', default_price: '' });
   };
 
   return (
@@ -114,7 +116,7 @@ export default function Services() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar por nome ou descrição..."
+              placeholder="Buscar por nome, descrição ou revendedora..."
               className="pl-10 bg-zinc-950 border-zinc-800 focus:border-red-600 focus:ring-1 focus:ring-red-600 rounded-sm"
               data-testid="services-search-input"
             />
@@ -163,6 +165,11 @@ export default function Services() {
                 {service.description && (
                   <p className="text-sm text-zinc-400 mb-3">{service.description}</p>
                 )}
+                {service.supplier && (
+                  <p className="text-xs text-zinc-500 mb-3">
+                    Revendedora: <span className="text-zinc-300">{service.supplier}</span>
+                  </p>
+                )}
                 <div className="text-2xl font-mono font-bold text-red-600">
                   R$ {service.default_price.toFixed(2)}
                 </div>
@@ -200,6 +207,16 @@ export default function Services() {
                     className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
                     rows={3}
                     data-testid="service-description-input"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="supplier" className="text-xs font-semibold uppercase text-zinc-500">Revendedora</Label>
+                  <Input
+                    id="supplier"
+                    value={formData.supplier}
+                    onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
+                    className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
+                    data-testid="service-supplier-input"
                   />
                 </div>
                 <div className="space-y-2">

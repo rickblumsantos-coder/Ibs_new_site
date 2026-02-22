@@ -14,7 +14,7 @@ export default function Parts() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPart, setEditingPart] = useState(null);
-  const [formData, setFormData] = useState({ name: '', description: '', price: '', stock: '0' });
+  const [formData, setFormData] = useState({ name: '', description: '', supplier: '', price: '', stock: '0' });
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredParts = useMemo(() => {
@@ -22,7 +22,8 @@ export default function Parts() {
     const term = searchTerm.toLowerCase();
     return parts.filter((part) =>
       part.name.toLowerCase().includes(term) ||
-      (part.description && part.description.toLowerCase().includes(term))
+      (part.description && part.description.toLowerCase().includes(term)) ||
+      (part.supplier && part.supplier.toLowerCase().includes(term))
     );
   }, [parts, searchTerm]);
 
@@ -47,7 +48,7 @@ export default function Parts() {
       const data = {
         ...formData,
         price: parseFloat(formData.price),
-        stock: parseInt(formData.stock),
+        stock: parseInt(formData.stock, 10),
       };
       if (editingPart) {
         await api.updatePart(editingPart.id, data);
@@ -69,6 +70,7 @@ export default function Parts() {
     setFormData({
       name: part.name,
       description: part.description || '',
+      supplier: part.supplier || '',
       price: part.price,
       stock: part.stock,
     });
@@ -89,7 +91,7 @@ export default function Parts() {
 
   const resetForm = () => {
     setEditingPart(null);
-    setFormData({ name: '', description: '', price: '', stock: '0' });
+    setFormData({ name: '', description: '', supplier: '', price: '', stock: '0' });
   };
 
   const getStockBadge = (stock) => {
@@ -125,7 +127,7 @@ export default function Parts() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar por nome ou descrição..."
+              placeholder="Buscar por nome, descrição ou revendedora..."
               className="pl-10 bg-zinc-950 border-zinc-800 focus:border-red-600 focus:ring-1 focus:ring-red-600 rounded-sm"
               data-testid="parts-search-input"
             />
@@ -177,6 +179,11 @@ export default function Parts() {
                 {part.description && (
                   <p className="text-sm text-zinc-400 mb-3">{part.description}</p>
                 )}
+                {part.supplier && (
+                  <p className="text-xs text-zinc-500 mb-3">
+                    Revendedora: <span className="text-zinc-300">{part.supplier}</span>
+                  </p>
+                )}
                 <div className="flex items-center justify-between">
                   <div className="text-2xl font-mono font-bold text-red-600">
                     R$ {part.price.toFixed(2)}
@@ -223,6 +230,16 @@ export default function Parts() {
                     className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
                     rows={3}
                     data-testid="part-description-input"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="supplier" className="text-xs font-semibold uppercase text-zinc-500">Revendedora</Label>
+                  <Input
+                    id="supplier"
+                    value={formData.supplier}
+                    onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
+                    className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
+                    data-testid="part-supplier-input"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">

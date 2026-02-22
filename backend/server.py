@@ -103,12 +103,14 @@ class Service(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     description: Optional[str] = None
+    supplier: Optional[str] = None
     default_price: float
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class ServiceCreate(BaseModel):
     name: str
     description: Optional[str] = None
+    supplier: Optional[str] = None
     default_price: float
 
 class Part(BaseModel):
@@ -116,6 +118,7 @@ class Part(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     description: Optional[str] = None
+    supplier: Optional[str] = None
     price: float
     stock: int = 0
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -123,6 +126,7 @@ class Part(BaseModel):
 class PartCreate(BaseModel):
     name: str
     description: Optional[str] = None
+    supplier: Optional[str] = None
     price: float
     stock: int = 0
 
@@ -147,6 +151,7 @@ class QuoteItem(BaseModel):
     type: Literal["service", "part"]
     item_id: str
     name: str
+    supplier: Optional[str] = None
     quantity: int
     unit_price: float
     total: float
@@ -173,6 +178,9 @@ class QuoteCreate(BaseModel):
     discount: float = 0
     labor_cost: float = 0
     notes: Optional[str] = None
+
+class QuoteStatusUpdate(BaseModel):
+    status: Literal["pending", "approved", "rejected", "completed"]
 
 class Settings(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -482,6 +490,19 @@ async def update_quote(quote_id: str, quote_data: QuoteCreate, username: str = D
     if updated.get('approved_at') and isinstance(updated['approved_at'], str):
         updated['approved_at'] = datetime.fromisoformat(updated['approved_at'])
     return Quote(**updated)
+
+@api_router.patch("/quotes/{quote_id}/status")
+async def update_quote_status(quote_id: str, status_data: QuoteStatusUpdate, username: str = Depends(verify_token)):
+    update_fields = {"status": status_data.status}
+    if status_data.status == "approved":
+        update_fields["approved_at"] = datetime.now(timezone.utc).isoformat()
+    else:
+        update_fields["approved_at"] = None
+
+    result = await db.quotes.update_one({"id": quote_id}, {"$set": update_fields})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Quote not found")
+    return {"message": "Quote status updated successfully", "status": status_data.status}
 
 @api_router.post("/quotes/{quote_id}/approve")
 async def approve_quote(quote_id: str, username: str = Depends(verify_token)):
