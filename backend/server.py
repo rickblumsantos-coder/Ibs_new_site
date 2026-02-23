@@ -13,12 +13,14 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import bcrypt
 import jwt
+import requests
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_CENTER, TA_RIGHT
+from reportlab.lib.enums import TA_RIGHT
+from reportlab.lib.utils import ImageReader
 import io
 
 ROOT_DIR = Path(__file__).parent
@@ -186,6 +188,7 @@ class Settings(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = "settings"
     workshop_name: str = "IBS Auto Center"
+    logo_url: Optional[str] = None
     whatsapp: Optional[str] = None
     email: Optional[str] = None
     email_api_key: Optional[str] = None
@@ -193,6 +196,7 @@ class Settings(BaseModel):
 
 class SettingsUpdate(BaseModel):
     workshop_name: Optional[str] = None
+    logo_url: Optional[str] = None
     whatsapp: Optional[str] = None
     email: Optional[str] = None
     email_api_key: Optional[str] = None
@@ -546,25 +550,103 @@ async def generate_quote_pdf(quote_id: str, username: str = Depends(verify_token
     story = []
     styles = getSampleStyleSheet()
     
-    title_style = ParagraphStyle(
-        'CustomTitle',
+    header_title_style = ParagraphStyle(
+        'HeaderTitle',
         parent=styles['Heading1'],
-        fontSize=24,
-        textColor=colors.HexColor('#DC2626'),
-        spaceAfter=30,
-        alignment=TA_CENTER
+        fontSize=18,
+        textColor=colors.white,
+        alignment=TA_RIGHT,
+        leading=22,
+        spaceAfter=4
     )
+    header_quote_style = ParagraphStyle(
+        'HeaderQuote',
+        parent=styles['Normal'],
+        fontSize=11,
+        textColor=colors.HexColor('#FCA5A5'),
+        alignment=TA_RIGHT,
+        leading=14,
+        spaceAfter=2
+    )
+    header_date_style = ParagraphStyle(
+        'HeaderDate',
+        parent=styles['Normal'],
+        fontSize=9,
+        textColor=colors.HexColor('#D4D4D8'),
+        alignment=TA_RIGHT,
+        leading=12
+    )
+
+    quote_date = datetime.fromisoformat(quote['created_at']).strftime('%d/%m/%Y %H:%M') if isinstance(quote['created_at'], str) else quote['created_at'].strftime('%d/%m/%Y %H:%M')
+
+    logo_box = None
+    logo_url = settings.get('logo_url')
+    if logo_url and not logo_url.startswith('blob:'):
+        try:
+            response = requests.get(logo_url, timeout=8)
+            response.raise_for_status()
+            logo_bytes = io.BytesIO(response.content)
+            image_reader = ImageReader(logo_bytes)
+            img_width, img_height = image_reader.getSize()
+            max_width = 1.25 * inch
+            max_height = 0.95 * inch
+            scale = min(max_width / img_width, max_height / img_height)
+            logo = Image(io.BytesIO(response.content), width=img_width * scale, height=img_height * scale)
+            logo.hAlign = 'CENTER'
+
+            logo_box = Table([[logo]], colWidths=[1.5 * inch], rowHeights=[1.15 * inch])
+            logo_box.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, -1), colors.white),
+                ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#E4E4E7')),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('TOPPADDING', (0, 0), (-1, -1), 6),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+                ('LEFTPADDING', (0, 0), (-1, -1), 6),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+            ]))
+        except Exception:
+            # Keep PDF generation working even if logo download fails.
+            logo_box = None
     
-    story.append(Paragraph(settings['workshop_name'], title_style))
-    story.append(Spacer(1, 0.3*inch))
+    header_content = [
+        Paragraph(settings['workshop_name'], header_title_style),
+        Paragraph(f"ORCAMENTO #{quote['id'][:8]}", header_quote_style),
+        Paragraph(f"Emitido em {quote_date}", header_date_style)
+    ]
+
+    if logo_box:
+        header_table = Table([[logo_box, header_content]], colWidths=[1.75 * inch, 4.25 * inch])
+        header_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#111827')),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('TOPPADDING', (0, 0), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+            ('LEFTPADDING', (0, 0), (-1, -1), 12),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 12),
+            ('LINEBELOW', (0, 0), (-1, -1), 3, colors.HexColor('#DC2626')),
+        ]))
+    else:
+        header_table = Table([[header_content]], colWidths=[6.0 * inch])
+        header_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#111827')),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('TOPPADDING', (0, 0), (-1, -1), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+            ('LEFTPADDING', (0, 0), (-1, -1), 12),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 12),
+            ('LINEBELOW', (0, 0), (-1, -1), 3, colors.HexColor('#DC2626')),
+        ]))
+
+    story.append(header_table)
     
-    story.append(Paragraph(f"<b>Orçamento #{quote['id'][:8]}</b>", styles['Heading2']))
     story.append(Spacer(1, 0.2*inch))
     
     info_data = [
         ['Cliente:', client['name'] if client else 'N/A'],
         ['Veículo:', f"{vehicle['brand']} {vehicle['model']} - {vehicle['license_plate']}" if vehicle else 'N/A'],
-        ['Data:', datetime.fromisoformat(quote['created_at']).strftime('%d/%m/%Y %H:%M') if isinstance(quote['created_at'], str) else quote['created_at'].strftime('%d/%m/%Y %H:%M')],
+        ['Data:', quote_date],
         ['Status:', quote['status'].upper()]
     ]
     

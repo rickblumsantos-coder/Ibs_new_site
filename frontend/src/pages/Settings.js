@@ -13,6 +13,7 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     workshop_name: 'IBS Auto Center',
+    logo_url: '',
     whatsapp: '',
     email: '',
     email_api_key: '',
@@ -36,6 +37,10 @@ export default function Settings() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if ((formData.logo_url || '').startsWith('blob:')) {
+      toast.error('URL blob nao funciona no PDF. Use link direto da imagem (https://...).');
+      return;
+    }
     setSaving(true);
     try {
       await api.updateSettings(formData);
@@ -99,6 +104,22 @@ export default function Settings() {
                     rows={3}
                     data-testid="address-input"
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="logo_url" className="text-xs font-semibold uppercase text-zinc-500">
+                    Logo (URL)
+                  </Label>
+                  <Input
+                    id="logo_url"
+                    value={formData.logo_url || ''}
+                    onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
+                    placeholder="https://exemplo.com/minha-logo.png"
+                    className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
+                    data-testid="logo-url-input"
+                  />
+                  <p className="text-xs text-zinc-600">
+                    Use URL direta da imagem (https://...). Link blob do WhatsApp Web nao funciona.
+                  </p>
                 </div>
               </div>
             </div>
