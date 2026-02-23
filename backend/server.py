@@ -615,14 +615,13 @@ async def generate_quote_pdf(quote_id: str, username: str = Depends(verify_token
 
             logo_box = Table([[logo]], colWidths=[1.5 * inch], rowHeights=[1.15 * inch])
             logo_box.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, -1), colors.white),
-                ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#E4E4E7')),
+                ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#111827')),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                ('TOPPADDING', (0, 0), (-1, -1), 6),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-                ('LEFTPADDING', (0, 0), (-1, -1), 6),
-                ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+                ('TOPPADDING', (0, 0), (-1, -1), 4),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+                ('LEFTPADDING', (0, 0), (-1, -1), 4),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 4),
             ]))
         except Exception:
             # Keep PDF generation working even if logo download fails.
