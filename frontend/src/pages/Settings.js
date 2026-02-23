@@ -11,6 +11,8 @@ import { Save } from 'lucide-react';
 export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [logoFile, setLogoFile] = useState(null);
   const [formData, setFormData] = useState({
     workshop_name: 'IBS Auto Center',
     logo_url: '',
@@ -49,6 +51,28 @@ export default function Settings() {
       toast.error('Erro ao salvar configurações');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleLogoUpload = async () => {
+    if (!logoFile) {
+      toast.error('Selecione um arquivo de imagem.');
+      return;
+    }
+    setUploadingLogo(true);
+    try {
+      const response = await api.uploadSettingsLogo(logoFile);
+      const logoUrl = response?.data?.logo_url || '';
+      if (!logoUrl) {
+        throw new Error('Upload did not return logo URL');
+      }
+      setFormData((prev) => ({ ...prev, logo_url: logoUrl }));
+      setLogoFile(null);
+      toast.success('Logo enviada com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao enviar logo. Use PNG, JPG, WEBP ou SVG ate 5MB.');
+    } finally {
+      setUploadingLogo(false);
     }
   };
 
@@ -120,6 +144,53 @@ export default function Settings() {
                   <p className="text-xs text-zinc-600">
                     Use URL direta da imagem (https://...). Link blob do WhatsApp Web nao funciona.
                   </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="logo_file" className="text-xs font-semibold uppercase text-zinc-500">
+                    Upload da Logo
+                  </Label>
+                  <Input
+                    id="logo_file"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                    onChange={(e) => setLogoFile(e.target.files?.[0] || null)}
+                    className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm file:bg-zinc-800 file:text-zinc-100 file:border-0"
+                    data-testid="logo-file-input"
+                  />
+                  <div className="flex items-center gap-3">
+                    <Button
+                      type="button"
+                      onClick={handleLogoUpload}
+                      disabled={uploadingLogo || !logoFile}
+                      className="bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold uppercase tracking-wide rounded-sm h-9 px-4"
+                      data-testid="upload-logo-button"
+                    >
+                      {uploadingLogo ? 'ENVIANDO...' : 'ENVIAR LOGO'}
+                    </Button>
+                    {formData.logo_url && (
+                      <a
+                        href={formData.logo_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs text-red-400 hover:text-red-300 underline"
+                      >
+                        Abrir logo atual
+                      </a>
+                    )}
+                  </div>
+                  <p className="text-xs text-zinc-600">
+                    Formatos aceitos: PNG, JPG, WEBP e SVG (maximo 5MB).
+                  </p>
+                  {formData.logo_url && (
+                    <div className="mt-2 bg-zinc-950 border border-zinc-800 rounded-sm p-3">
+                      <p className="text-xs text-zinc-500 mb-2">Pre-visualizacao</p>
+                      <img
+                        src={formData.logo_url}
+                        alt="Logo da oficina"
+                        className="max-h-20 w-auto object-contain"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

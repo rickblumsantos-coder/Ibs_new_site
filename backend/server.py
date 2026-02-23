@@ -1,6 +1,7 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, Request, UploadFile, File
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -22,9 +23,12 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_RIGHT
 from reportlab.lib.utils import ImageReader
 import io
+from urllib.parse import urlparse
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+UPLOADS_DIR = ROOT_DIR / "uploads"
+UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -583,15 +587,30 @@ async def generate_quote_pdf(quote_id: str, username: str = Depends(verify_token
     logo_url = settings.get('logo_url')
     if logo_url and not logo_url.startswith('blob:'):
         try:
-            response = requests.get(logo_url, timeout=8)
-            response.raise_for_status()
-            logo_bytes = io.BytesIO(response.content)
+            logo_content = None
+            logo_path = None
+
+            if logo_url.startswith('/uploads/'):
+                logo_path = ROOT_DIR / logo_url.lstrip('/')
+            elif logo_url.startswith('http://') or logo_url.startswith('https://'):
+                parsed = urlparse(logo_url)
+                if parsed.path.startswith('/uploads/'):
+                    logo_path = ROOT_DIR / parsed.path.lstrip('/')
+
+            if logo_path and logo_path.exists():
+                logo_content = logo_path.read_bytes()
+            else:
+                response = requests.get(logo_url, timeout=8)
+                response.raise_for_status()
+                logo_content = response.content
+
+            logo_bytes = io.BytesIO(logo_content)
             image_reader = ImageReader(logo_bytes)
             img_width, img_height = image_reader.getSize()
             max_width = 1.25 * inch
             max_height = 0.95 * inch
             scale = min(max_width / img_width, max_height / img_height)
-            logo = Image(io.BytesIO(response.content), width=img_width * scale, height=img_height * scale)
+            logo = Image(io.BytesIO(logo_content), width=img_width * scale, height=img_height * scale)
             logo.hAlign = 'CENTER'
 
             logo_box = Table([[logo]], colWidths=[1.5 * inch], rowHeights=[1.15 * inch])
@@ -739,6 +758,46 @@ async def get_settings(username: str = Depends(verify_token)):
         await db.settings.insert_one(settings)
     return Settings(**settings)
 
+@api_router.post("/settings/logo-upload")
+async def upload_settings_logo(
+    request: Request,
+    file: UploadFile = File(...),
+    username: str = Depends(verify_token)
+):
+    allowed_types = {
+        "image/png": ".png",
+        "image/jpeg": ".jpg",
+        "image/jpg": ".jpg",
+        "image/webp": ".webp",
+        "image/svg+xml": ".svg",
+    }
+    max_size = 5 * 1024 * 1024
+
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Invalid logo format. Use PNG, JPG, WEBP or SVG.")
+
+    content = await file.read()
+    if not content:
+        raise HTTPException(status_code=400, detail="Empty file.")
+    if len(content) > max_size:
+        raise HTTPException(status_code=400, detail="Logo too large. Max size is 5MB.")
+
+    file_ext = allowed_types[file.content_type]
+    filename = f"logo_{uuid.uuid4().hex}{file_ext}"
+    file_path = UPLOADS_DIR / filename
+    file_path.write_bytes(content)
+
+    base_url = str(request.base_url).rstrip("/")
+    logo_url = f"{base_url}/uploads/{filename}"
+
+    await db.settings.update_one(
+        {"id": "settings"},
+        {"$set": {"logo_url": logo_url}},
+        upsert=True
+    )
+
+    return {"logo_url": logo_url}
+
 @api_router.put("/settings", response_model=Settings)
 async def update_settings(settings_data: SettingsUpdate, username: str = Depends(verify_token)):
     await db.settings.update_one(
@@ -808,7 +867,7 @@ app.add_middleware(
 )
 
 # Include the router in the main app
-
+app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 app.include_router(api_router)
 
 logging.basicConfig(

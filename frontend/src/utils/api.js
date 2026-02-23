@@ -47,6 +47,13 @@ export const api = {
   // Settings
   getSettings: () => axios.get(`${API_URL}/settings`),
   updateSettings: (data) => axios.put(`${API_URL}/settings`, data),
+  uploadSettingsLogo: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return axios.post(`${API_URL}/settings/logo-upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
 
   // Dashboard
   getDashboardStats: () => axios.get(`${API_URL}/dashboard/stats`),
