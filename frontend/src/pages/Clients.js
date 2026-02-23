@@ -143,7 +143,7 @@ export default function Clients() {
   const filteredClients = useMemo(
     () => clients.filter((client) =>
       client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.phone.includes(searchTerm) ||
+      (client.phone || '').includes(searchTerm) ||
       (client.email && client.email.toLowerCase().includes(searchTerm.toLowerCase()))
     ),
     [clients, searchTerm]
@@ -210,7 +210,7 @@ export default function Clients() {
                       className="border-b border-zinc-800 hover:bg-zinc-900/50 transition-colors h-12"
                     >
                       <td className="text-sm text-zinc-200 px-4">{client.name}</td>
-                      <td className="text-sm text-zinc-200 px-4 font-mono">{client.phone}</td>
+                      <td className="text-sm text-zinc-200 px-4 font-mono">{client.phone || '-'}</td>
                       <td className="text-sm text-zinc-200 px-4">{client.email || '-'}</td>
                       <td className="text-sm text-zinc-200 px-4 font-mono">{client.cpf || '-'}</td>
                       <td className="px-4">
@@ -276,13 +276,12 @@ export default function Clients() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="text-xs font-semibold uppercase text-zinc-500">
-                    Telefone *
+                    Telefone
                   </Label>
                   <Input
                     id="phone"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    required
                     className="bg-zinc-950 border-zinc-800 focus:border-red-600 rounded-sm"
                     data-testid="client-phone-input"
                   />

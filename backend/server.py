@@ -56,7 +56,7 @@ class Client(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
-    phone: str
+    phone: Optional[str] = ""
     email: Optional[EmailStr] = None
     cpf: Optional[str] = None
     address: Optional[str] = None
@@ -64,7 +64,7 @@ class Client(BaseModel):
 
 class ClientCreate(BaseModel):
     name: str
-    phone: str
+    phone: Optional[str] = ""
     email: Optional[EmailStr] = None
     cpf: Optional[str] = None
     address: Optional[str] = None
